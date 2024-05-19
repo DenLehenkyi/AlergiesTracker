@@ -1,24 +1,51 @@
 import React, { useState } from 'react';
-import { View, Text, Switch, Button } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { List, Switch, Button } from 'react-native-paper';
+import { useNavigation } from '@react-navigation/native';
 
+const SettingsScreen = () => {
+    const [isDarkTheme, setIsDarkTheme] = useState(false);
+    const [isMuted, setIsMuted] = useState(false);
+    const navigation = useNavigation();
 
+    const toggleTheme = () => setIsDarkTheme(!isDarkTheme);
+    const toggleMute = () => setIsMuted(!isMuted);
 
-export default function SettingsScreen({ navigation }) {
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [isSoundEnabled, setIsSoundEnabled] = useState(true);
+    const handleLogout = () => {
+        // Implement your logout logic here
+        navigation.navigate('Login'); // Assuming you have a Login screen
+    };
 
-  const handleLogout = () => {
-    // Логіка для виходу з облікового запису
-    navigation.navigate('Login');
-  };
+    return (
+        <View style={styles.container}>
+            <List.Section>
+                <List.Subheader>Settings</List.Subheader>
+                <List.Item
+                    title="Change Language"
+                    right={() => <Button mode="contained" onPress={() => { /* Implement language change logic */ }}>Change</Button>}
+                />
+                <List.Item
+                    title="Dark Theme"
+                    right={() => <Switch value={isDarkTheme} onValueChange={toggleTheme} />}
+                />
+                <List.Item
+                    title="Mute Sound"
+                    right={() => <Switch value={isMuted} onValueChange={toggleMute} />}
+                />
+                <List.Item
+                    title="Logout"
+                    right={() => <Button mode="contained" onPress={handleLogout}>Logout</Button>}
+                />
+            </List.Section>
+        </View>
+    );
+};
 
-  return (
-    <View style={{ padding: 20 }}>
-      <Text>Dark Mode</Text>
-      <Switch value={isDarkMode} onValueChange={setIsDarkMode} />
-      <Text>Sound</Text>
-      <Switch value={isSoundEnabled} onValueChange={setIsSoundEnabled} />
-      <Button title="Logout" onPress={handleLogout} />
-    </View>
-  );
-}
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        padding: 16,
+    },
+});
+
+export default SettingsScreen;

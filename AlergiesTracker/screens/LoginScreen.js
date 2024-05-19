@@ -193,8 +193,9 @@ export default function AuthScreen({ navigation }) {
 }
 
 const StyledForm = styled(View)`
-  margin-top: 90px;
+  margin-top: 10px;
   padding: 20px;
+  margin-bottom: 120px;
 `;
 
 const EmailDiv = styled(View)`
