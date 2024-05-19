@@ -22,19 +22,23 @@ const SettingsScreen = () => {
                 <List.Subheader>Налаштування</List.Subheader>
                 <List.Item
                     title="Змінити мову"
-                    right={() => <Button mode="contained" onPress={() => { /* Implement language change logic */ }}>Change</Button>}
+                    titleStyle={styles.title}
+                    right={() => <Button labelStyle={styles.buttonText} style={styles.button} mode="contained" onPress={() => { /* Implement language change logic */ }}>Змінити</Button>}
                 />
                 <List.Item
                     title="Чорна тема"
-                    right={() => <Switch value={isDarkTheme} onValueChange={toggleTheme} />}
+                    titleStyle={styles.title}
+                    right={() => <Switch value={isDarkTheme} color='#E2FFE6' onValueChange={toggleTheme} />}
                 />
                 <List.Item
                     title="Вимкнути звук"
-                    right={() => <Switch value={isMuted} onValueChange={toggleMute} />}
+                    titleStyle={styles.title}
+                    right={() => <Switch value={isMuted} color='#E2FFE6' onValueChange={toggleMute} />}
                 />
                 <List.Item
                     title="Вийти"
-                    right={() => <Button mode="contained" onPress={handleLogout}>Вийти</Button>}
+                    titleStyle={styles.title}
+                    right={() => <Button style={styles.button} labelStyle={styles.buttonText} mode="contained" onPress={handleLogout}>Вийти</Button>}
                 />
             </List.Section>
         </View>
@@ -45,8 +49,21 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 16,
+        backgroundColor: '#78C599',
     },
-    
+    button: {
+        backgroundColor: '#E2FFE6',
+    },
+    buttonText: {
+        color: 'black',
+        fontSize: 18
+    },
+    title:{
+      fontWeight: 600,
+      fontSize: 20,
+
+
+    }
 });
 
 export default SettingsScreen;
