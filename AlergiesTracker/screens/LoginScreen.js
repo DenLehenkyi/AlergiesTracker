@@ -25,7 +25,7 @@ export default function AuthScreen({ navigation }) {
   return (
     <>
   
-       
+       <MyDrawer></MyDrawer>
       {/* <StyledTitle>Alergies Tracker</StyledTitle> */}
       {isRegister ? (
         <StyledForm>

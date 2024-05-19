@@ -1,6 +1,7 @@
-import * as React from 'react';
-import { Appbar, Drawer, Provider as PaperProvider } from 'react-native-paper';
-import styled from 'styled-components/native';
+import * as React from "react";
+import { Appbar, Drawer, Provider as PaperProvider } from "react-native-paper";
+import { StyleSheet, View, Text } from "react-native";
+import Svg, { Path } from "react-native-svg";
 
 const MyDrawer = () => {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
@@ -16,50 +17,105 @@ const MyDrawer = () => {
         <Appbar.Content title="Alergies Tracker" />
       </Appbar.Header>
       {drawerOpen && (
-        <StyledDrawerSection>
-          <StyledDrawerItem 
-            label="Головна" 
-            onPress={() => {}} 
-            titleStyle={styledTitle}
+        <View style={styles.drawerSection}>
+          <Drawer.Item
+            label="Головна"
+            onPress={() => {}}
+            style={styles.drawerItem}
+            icon={() => (
+              <SvgIcon
+                width="29"
+                height="25"
+                viewBox="0 0 29 25"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <Path
+                  d="M13.6265 0.162847C13.5225 0.228522 10.4577 2.45602 6.81815 5.12136C2.54923 8.25191 0.16301 10.0306 0.0973345 10.1401C-0.258409 10.7202 0.431186 11.4536 1.03321 11.1416C1.10984 11.1033 4.03788 8.96887 7.54606 6.39657C11.0542 3.82974 13.9604 1.72264 14.0042 1.72264C14.048 1.72264 16.9924 3.85163 20.5389 6.4513C26.5811 10.8735 27.008 11.1745 27.2433 11.1964C27.8344 11.2456 28.223 10.6053 27.8946 10.1182C27.818 10.0033 25.3223 8.14245 21.3106 5.20346C17.7586 2.60379 14.7047 0.376293 14.5296 0.26136C14.1519 0.0150766 13.9111 -0.0122881 13.6265 0.162847Z"
+                  fill="#214E34"
+                />
+                <Path
+                  d="M3.41937 11.377C3.06363 11.6068 3.08552 11.1799 3.0691 17.8898C3.05816 21.2447 3.0691 24.1235 3.08552 24.2877C3.11289 24.5121 3.16214 24.6216 3.30444 24.7803L3.48505 24.9773L7.37634 24.9937C11.6781 25.0102 11.4865 25.0211 11.7055 24.6599C11.8094 24.4902 11.8149 24.3589 11.8149 20.7795C11.8149 18.2456 11.8368 16.9813 11.8751 16.7843C12.1159 15.6459 13.2379 14.8851 14.3653 15.0931C15.2629 15.2573 15.947 15.9086 16.1331 16.7843C16.1714 16.9813 16.1933 18.2456 16.1933 20.7795C16.1933 24.3589 16.1988 24.4902 16.3028 24.6599C16.5217 25.0211 16.3301 25.0102 20.6319 24.9937L24.5232 24.9773L24.7038 24.7803C24.8461 24.6216 24.8953 24.5121 24.9227 24.2877C24.9391 24.1235 24.9501 21.2447 24.9391 17.8898C24.9227 12.176 24.9172 11.7765 24.8242 11.6123C24.5615 11.1252 23.8117 11.1526 23.5545 11.6506C23.4833 11.7874 23.4724 12.6084 23.4724 17.6983V23.5817H20.5772H17.6765L17.6546 20.1447C17.6327 16.3136 17.6327 16.3519 17.2441 15.5966C16.7515 14.6498 15.8649 13.9383 14.8743 13.703C14.4091 13.5935 13.5444 13.599 13.0956 13.7085C12.1159 13.9547 11.1636 14.7429 10.7258 15.6623C10.3701 16.4176 10.3755 16.3136 10.3536 20.1228L10.3317 23.5817H7.43107H4.53586V17.6983C4.53586 11.2785 4.55228 11.6397 4.22937 11.3824C4.03782 11.2292 3.63829 11.2292 3.41937 11.377Z"
+                  fill="#214E34"
+                />
+              </SvgIcon>
+            )}
           />
-          <StyledDrawerItem 
-            label="Обліковий запис" 
-            onPress={() => {}} 
-            titleStyle={styledTitle}
+          <View style={styles.svgWrapper}>
+            <Svg
+              width="29"
+              height="25"
+              viewBox="0 0 29 25"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              style={styles.svgIcon}
+            >
+              <Path
+                d="M13.6265 0.162847C13.5225 0.228522 10.4577 2.45602 6.81815 5.12136C2.54923 8.25191 0.16301 10.0306 0.0973345 10.1401C-0.258409 10.7202 0.431186 11.4536 1.03321 11.1416C1.10984 11.1033 4.03788 8.96887 7.54606 6.39657C11.0542 3.82974 13.9604 1.72264 14.0042 1.72264C14.048 1.72264 16.9924 3.85163 20.5389 6.4513C26.5811 10.8735 27.008 11.1745 27.2433 11.1964C27.8344 11.2456 28.223 10.6053 27.8946 10.1182C27.818 10.0033 25.3223 8.14245 21.3106 5.20346C17.7586 2.60379 14.7047 0.376293 14.5296 0.26136C14.1519 0.0150766 13.9111 -0.0122881 13.6265 0.162847Z"
+                fill="#214E34"
+              />
+              <Path
+                d="M3.41937 11.377C3.06363 11.6068 3.08552 11.1799 3.0691 17.8898C3.05816 21.2447 3.0691 24.1235 3.08552 24.2877C3.11289 24.5121 3.16214 24.6216 3.30444 24.7803L3.48505 24.9773L7.37634 24.9937C11.6781 25.0102 11.4865 25.0211 11.7055 24.6599C11.8094 24.4902 11.8149 24.3589 11.8149 20.7795C11.8149 18.2456 11.8368 16.9813 11.8751 16.7843C12.1159 15.6459 13.2379 14.8851 14.3653 15.0931C15.2629 15.2573 15.947 15.9086 16.1331 16.7843C16.1714 16.9813 16.1933 18.2456 16.1933 20.7795C16.1933 24.3589 16.1988 24.4902 16.3028 24.6599C16.5217 25.0211 16.3301 25.0102 20.6319 24.9937L24.5232 24.9773L24.7038 24.7803C24.8461 24.6216 24.8953 24.5121 24.9227 24.2877C24.9391 24.1235 24.9501 21.2447 24.9391 17.8898C24.9227 12.176 24.9172 11.7765 24.8242 11.6123C24.5615 11.1252 23.8117 11.1526 23.5545 11.6506C23.4833 11.7874 23.4724 12.6084 23.4724 17.6983V23.5817H20.5772H17.6765L17.6546 20.1447C17.6327 16.3136 17.6327 16.3519 17.2441 15.5966C16.7515 14.6498 15.8649 13.9383 14.8743 13.703C14.4091 13.5935 13.5444 13.599 13.0956 13.7085C12.1159 13.9547 11.1636 14.7429 10.7258 15.6623C10.3701 16.4176 10.3755 16.3136 10.3536 20.1228L10.3317 23.5817H7.43107H4.53586V17.6983C4.53586 11.2785 4.55228 11.6397 4.22937 11.3824C4.03782 11.2292 3.63829 11.2292 3.41937 11.377Z"
+                fill="#214E34"
+              />
+            </Svg>
+          </View>
+          <Drawer.Item
+            label="Обліковий запис"
+            onPress={() => {}}
+            style={styles.drawerItem}
           />
-          <StyledDrawerItem 
-            label="Налаштування" 
-            onPress={() => {}} 
-            titleStyle={styledTitle}
+          <Drawer.Item
+            label="Налаштування"
+            onPress={() => {}}
+            style={styles.drawerItem}
           />
-        </StyledDrawerSection>
+        </View>
       )}
     </PaperProvider>
   );
 };
 
-// Styled components using styled-components library
-const StyledDrawerSection = styled(Drawer.Section)`
-  width: 300px;
-  height: 900px;
-  background-color: #78C599;
-  
-`;
-
-const StyledDrawerItem = styled(Drawer.Item)`
-  width: 253px;
-  height: 53px;
-  background-color: #E2FFE6;
-  margin-top: 25px;
-  border-radius: 10px;
-  text-align: center;
-  z-index:15;
-`;
-
-const styledTitle = {
-  fontSize: 12,
-  color: '#333',
-  textAlign: 'right',
-};
+const SvgIcon = ({ icon }) => (
+  <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <Path d={icon} fill="#000000" />
+  </Svg>
+);
+const styles = StyleSheet.create({
+  drawerSection: {
+    width: 300,
+    height: 900,
+    backgroundColor: "#78c599",
+    zIndex: 15,
+    position: "absolute",
+  },
+  drawerItem: {
+    width: 253,
+    backgroundColor: "#e2ffe6",
+    marginTop: 15,
+    borderRadius: 10,
+    zIndex: 15,
+  },
+  drawerItemContent: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+  },
+  textWrapper: {
+    flex: 1,
+  },
+  drawerItemLabel: {
+    fontSize: 12,
+    color: "#333",
+    textAlign: "right",
+  },
+  svgIcon: {
+    marginTop: 27,
+    marginLeft: 17,
+    position: "absolute",
+  },
+  svgWrapper: {
+    position: "absolute",
+  },
+});
 
 export default MyDrawer;
