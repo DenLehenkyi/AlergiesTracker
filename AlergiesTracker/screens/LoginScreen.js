@@ -24,9 +24,9 @@ export default function AuthScreen({ navigation }) {
 
   return (
     <>
-    <PaperProvider>
+    {/* <PaperProvider>
     <MyDrawer/>
-    </PaperProvider>
+    </PaperProvider> */}
        
       {/* <StyledTitle>Alergies Tracker</StyledTitle> */}
       {isRegister ? (
@@ -193,9 +193,9 @@ export default function AuthScreen({ navigation }) {
 }
 
 const StyledForm = styled(View)`
-  margin-top: 10px;
+  margin-top: 150px;
   padding: 20px;
-  margin-bottom: 120px;
+  margin-bottom: 50px;
 `;
 
 const EmailDiv = styled(View)`

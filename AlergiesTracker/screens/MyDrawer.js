@@ -29,8 +29,8 @@ const MyDrawer = () => {
           />
           <StyledDrawerItem 
             label="Налаштування" 
-            onPress={() => {}} 
             titleStyle={styledTitle}
+            onPress={() => navigation.navigate('Settings')} 
           />
         </StyledDrawerSection>
       )}
