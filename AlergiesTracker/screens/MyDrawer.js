@@ -42,12 +42,13 @@ const MyDrawer = () => {
 const StyledDrawerSection = styled(Drawer.Section)`
   width: 300px;
   background-color: #78C599;
+  z-index:5
 `;
 
 const StyledDrawerItem = styled(Drawer.Item)`
   width: 253px;
   background-color: #E2FFE6;
-  margin-vertical: 5px;
+  margin-top: 15px;
   border-radius: 10px;
   text-align: center;
 `;
