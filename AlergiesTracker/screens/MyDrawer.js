@@ -4,11 +4,12 @@ import { StyleSheet, View, Text } from "react-native";
 import Svg, { Path } from "react-native-svg";
 
 const MyDrawer = () => {
-  const [drawerOpen, setDrawerOpen] = React.useState(false);
+    const [drawerOpen, setDrawerOpen] = React.useState(false);
+    const navigation = useNavigation();
 
-  const toggleDrawer = () => {
-    setDrawerOpen(!drawerOpen);
-  };
+    const toggleDrawer = () => {
+        setDrawerOpen(!drawerOpen);
+    };
 
   return (
     <PaperProvider>
