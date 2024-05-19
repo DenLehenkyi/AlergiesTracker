@@ -214,7 +214,7 @@ const IconWrapper = styled(View)`
   background: rgba(139, 219, 173, 1);
   border-radius: 15px;
   position: absolute;
-  z-index: 1;
+  z-index:1;
   margin-left: 53px;
   border-width: 1px;
   border-color: #ccc;

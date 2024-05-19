@@ -41,15 +41,19 @@ const MyDrawer = () => {
 // Styled components using styled-components library
 const StyledDrawerSection = styled(Drawer.Section)`
   width: 300px;
+  height: 900px;
   background-color: #78C599;
+  
 `;
 
 const StyledDrawerItem = styled(Drawer.Item)`
   width: 253px;
+  height: 53px;
   background-color: #E2FFE6;
-  margin-vertical: 5px;
+  margin-top: 25px;
   border-radius: 10px;
   text-align: center;
+  z-index:15;
 `;
 
 const styledTitle = {
