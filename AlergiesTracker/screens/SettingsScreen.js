@@ -19,22 +19,22 @@ const SettingsScreen = () => {
     return (
         <View style={styles.container}>
             <List.Section>
-                <List.Subheader>Settings</List.Subheader>
+                <List.Subheader>Налаштування</List.Subheader>
                 <List.Item
-                    title="Change Language"
+                    title="Змінити мову"
                     right={() => <Button mode="contained" onPress={() => { /* Implement language change logic */ }}>Change</Button>}
                 />
                 <List.Item
-                    title="Dark Theme"
+                    title="Чорна тема"
                     right={() => <Switch value={isDarkTheme} onValueChange={toggleTheme} />}
                 />
                 <List.Item
-                    title="Mute Sound"
+                    title="Вимкнути звук"
                     right={() => <Switch value={isMuted} onValueChange={toggleMute} />}
                 />
                 <List.Item
-                    title="Logout"
-                    right={() => <Button mode="contained" onPress={handleLogout}>Logout</Button>}
+                    title="Вийти"
+                    right={() => <Button mode="contained" onPress={handleLogout}>Вийти</Button>}
                 />
             </List.Section>
         </View>
@@ -46,6 +46,7 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 16,
     },
+    
 });
 
 export default SettingsScreen;
