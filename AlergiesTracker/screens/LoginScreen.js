@@ -13,7 +13,8 @@ export default function AuthScreen() {
   const navigation = useNavigation();
   const handleLogin = async () => {
     try {
-      const userData = await AsyncStorage.getItem(email);
+      const userDataKey = `userData`; // Створюємо унікальний ключ для кожного користувача
+      const userData = await AsyncStorage.getItem(userDataKey);
       if (userData) {
         const savedData = JSON.parse(userData);
         if (savedData.password === password) {
@@ -28,6 +29,7 @@ export default function AuthScreen() {
       console.error("Помилка при вході:", error);
     }
   };
+  
 
   const handleRegister = async () => {
     try {
