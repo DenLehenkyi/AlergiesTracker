@@ -199,7 +199,7 @@ export default function AuthScreen() {
               placeholder="Пароль"
             />
           </EmailDiv>
-          <LoginButton title="Login" onPress={handleLogin}>
+          <LoginButton title="Login" onPress={handleLogin}  >
             <ButtonText>Увійти</ButtonText>
           </LoginButton>
           <StyledDiv>
