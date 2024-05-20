@@ -1,6 +1,5 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import Svg, { Path } from "react-native-svg";
 import EggSvg from "../assets/svgs/egg";
 import NutsSvg from "../assets/svgs/nuts";
 import ZernoSvg from "../assets/svgs/zerno";
@@ -89,20 +88,22 @@ const ProductsArray = [
   }
 ];
 
-const ProductsGrid = ({ oncklick }) => {
+const ProductsGrid = ({ oncklick, selectedProducts }) => {
   return (
     <View style={styles.allProducts}>
       {ProductsArray.map((item, index) => (
-              <TouchableOpacity
-              style={styles.product}
-              onPress={() => oncklick(item)}
-              key={index}
-            >
+        <TouchableOpacity
+          style={[
+            styles.product,
+            selectedProducts.some((p) => p.name === item.name) && styles.selectedProduct,
+          ]}
+          onPress={() => oncklick(item)}
+          key={index}
+        >
           <Text style={styles.name}>{item.name}</Text>
-          <item.svg/>
+          <item.svg />
         </TouchableOpacity>
       ))}
-
     </View>
   );
 };
@@ -113,7 +114,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 30,
     marginBottom: 50,
-    marginLeft: 20,
+    marginHorizontal: "auto",
   },
   product: {
     width: 88,
@@ -124,11 +125,13 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.35,
     shadowRadius: 15,
-    // Elevation for Android
     elevation: 5,
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
+  },
+  selectedProduct: {
+    backgroundColor: "#A4D4AE", // Darker shade for selected product
   },
   name: {
     marginTop: 8,

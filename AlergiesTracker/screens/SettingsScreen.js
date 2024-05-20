@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, StyleSheet, Text } from "react-native";
 import { List, Switch, Button } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
-import { useTheme } from "@rneui/themed";
+
 import { useContext } from "react";
 import lightTheme from "../themes/lightTheme";
 import darkTheme from "../themes/darkTheme";
