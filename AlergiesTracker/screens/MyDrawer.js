@@ -22,7 +22,7 @@ const MyDrawer = () => {
         <View style={styles.drawerSection}>
         <Drawer.Item
           label="Головна"
-          onPress={() => {}}
+          onPress={() => navigation.navigate('Home')} 
           style={styles.drawerItem}
           icon={() => (
             <SvgIcon
@@ -64,7 +64,7 @@ const MyDrawer = () => {
         </View>
         <Drawer.Item
           label="Обліковий запис"
-          onPress={() => {}}
+          onPress={() => navigation.navigate('Profile')} 
           style={styles.drawerItem}
         />
         <Drawer.Item

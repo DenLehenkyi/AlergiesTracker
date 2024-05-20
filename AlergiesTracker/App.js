@@ -7,7 +7,7 @@ import AddAllergyScreen from "./screens/AddAllergyScreen";
 import LoginScreen from "./screens/LoginScreen";
 import HomeScreen from "./screens/HomeScreen";
 import SettingsScreen from "./screens/SettingsScreen";
-import MyDrawer from "./screens/MyDrawer";
+import ProfileScreen from "./screens/ProfileScreen";
 
 const Stack = createStackNavigator();
 
@@ -22,6 +22,7 @@ function App() {
       <Stack.Navigator initialRouteName="Login">
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Profile" component={ProfileScreen} />
         <Stack.Screen name="Settings" component={SettingsScreen} />
         <Stack.Screen name="AddAllergy" component={AddAllergyScreen} />
         {/* <Stack.Screen name="AllergyDetail" component={AllergyDetailScreen} />  */}
