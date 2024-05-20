@@ -4,16 +4,27 @@ import { StyleSheet, View, Text, ScrollView } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import MyDrawer from "./MyDrawer";
 import { Rect } from "react-native-svg";
-import G from "react-native-svg";
-import ProductsGrid from "../ProductsGrid";
+
+
+import ProductsGrid from "../components/ProductsGrid";
+import Categories from "../components/Categories";
 
 export default AddAllergyScreeen = () => {
     const [showCategories, setShowCategories] = React.useState(false);
     const [chosenProducts, setChosenProducts] = React.useState([]);
+    React.useEffect(() => {
+      setChosenProducts([]);
+    }, []);
     const toggleCategories = (product) => {
-        setChosenProducts(prevProducts => [...prevProducts, product]);
-        console.log(chosenProducts);
+      setChosenProducts((prevProducts) => {
+        if (prevProducts.some((p) => p.name === product.name)) {
+          return prevProducts;
+        }
+        return [...prevProducts, product];
+      });
+
         setShowCategories(true);
+        console.log(showCategories);
       };
   return (
     <>
@@ -21,6 +32,12 @@ export default AddAllergyScreeen = () => {
       <ScrollView style={styles.container}>
         <Text style={styles.text}>Додайте алерген</Text>
         <ProductsGrid oncklick={toggleCategories}/>
+        {console.log(chosenProducts)}
+        {showCategories && (
+            <Categories products={chosenProducts}></Categories>
+        )
+            
+        }
    
       </ScrollView>
     </>
