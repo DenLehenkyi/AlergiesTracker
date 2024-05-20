@@ -1,52 +1,46 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, FlatList, Button } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import MyDrawer from "./MyDrawer";
-import { PaperProvider } from "react-native-paper";
+import { View, Text, Button, Alert } from "react-native";
 
-export default function HomeScreen({ navigation }) {
-  const [allergies, setAllergies] = useState([]);
+export default function HomeScreen() {
+  const [userData, setUserData] = useState(null);
 
   useEffect(() => {
-    // Отримання даних з AsyncStorage
-    const fetchData = async () => {
-      const data = await AsyncStorage.getItem("allergies");
-      if (data) {
-        setAllergies(JSON.parse(data));
-      }
-    };
-    fetchData();
+    retrieveUserData();
   }, []);
 
+  const retrieveUserData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem("userData");
+      if (jsonValue !== null) {
+        setUserData(JSON.parse(jsonValue));
+      }
+    } catch (error) {
+      console.error("Помилка при отриманні даних з AsyncStorage:", error);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem("userData");
+      setUserData(null);
+    } catch (error) {
+      console.error("Помилка при видаленні даних з AsyncStorage:", error);
+    }
+  };
+
   return (
-    <>
-        <MyDrawer />
-      <View style={{ flex: 1, padding: 20 }}>
-        <FlatList
-          data={allergies}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={{ padding: 10, borderBottomWidth: 1 }}>
-              <Text>{item.name}</Text>
-              <Text>Intensity: {item.intensity}</Text>
-              <Button
-                title="View Details"
-                onPress={() =>
-                  navigation.navigate("AllergyDetail", { allergy: item })
-                }
-              />
-            </View>
-          )}
-        />
-        <Button
-          title="Add Allergy"
-          onPress={() => navigation.navigate("AddAllergy")}
-        />
-        <Button
-          title="Settings"
-          onPress={() => navigation.navigate("Settings")}
-        />
-      </View>
-    </>
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      {userData ? (
+        <View>
+          <Text>Ім'я: {userData.name}</Text>
+          <Text>Прізвище: {userData.surname}</Text>
+          <Text>Email: {userData.email}</Text>
+          <Button title="Вийти" onPress={handleLogout} />
+        </View>
+      ) : (
+        <Text>Немає даних про користувача</Text>
+      )}
+    </View>
   );
 }
