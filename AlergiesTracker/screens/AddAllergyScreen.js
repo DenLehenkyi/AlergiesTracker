@@ -62,8 +62,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 30,
     marginBottom: 50,
-    marginLeft:20
-
+    marginLeft: 20,
   },
   product: {
     width: 88,
@@ -79,7 +78,6 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-
   },
 
   name: {

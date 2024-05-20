@@ -24,7 +24,7 @@ export default function ProfileScreen() {
 
   const handleLogout = async () => {
     try {
-      await AsyncStorage.removeItem("userData");
+     // await AsyncStorage.removeItem("userData");
       setUserData(null);
     } catch (error) {
       console.error("Помилка при видаленні даних з AsyncStorage:", error);
