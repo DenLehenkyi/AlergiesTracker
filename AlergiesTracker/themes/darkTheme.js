@@ -1,6 +1,8 @@
 const darkTheme = {
-    backgroundColor: '#black',
-    textColor: '#ffffff',
+    backgroundColor: 'black',
+    textColor: 'white',
+    lightGreen: 'black',
+    buttonColor: "green"
     // інші кольори теми
   };
   

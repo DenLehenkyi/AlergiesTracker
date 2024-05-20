@@ -7,8 +7,10 @@ import { useContext } from "react";
 import lightTheme from "../themes/lightTheme";
 import darkTheme from "../themes/darkTheme";
 import ThemeContext from "../Context/ThemeContext";
+
 const SettingsScreen = () => {
   const { theme, toggleTheme } = useContext(ThemeContext);
+ 
   const [isDarkTheme, setIsDarkTheme] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const navigation = useNavigation();
@@ -23,19 +25,21 @@ const SettingsScreen = () => {
   };
 
   return (
-    <View style={styles.mainContainer}>
-      <View
-        style={[styles.container, { backgroundColor: theme.backgroundColor }]}
-      >
+    <View
+      style={[styles.mainContainer, { backgroundColor: theme.backgroundColor }]}
+    >
+      <View style={[styles.container, { backgroundColor: theme.lightGreen }]}>
         <List.Section>
-          <List.Subheader>Налаштування</List.Subheader>
+          <List.Subheader style={{ color: theme.textColor }}>
+            Налаштування
+          </List.Subheader>
           <List.Item
             title="Змінити мову"
-            titleStyle={styles.title}
+            titleStyle={[styles.title, { color: theme.textColor }]}
             right={() => (
               <Button
-                labelStyle={styles.buttonText}
-                style={styles.button}
+                labelStyle={[styles.buttonText, { color: theme.textColor }]}
+                style={[styles.button, { backgroundColor: theme.buttonColor }]}
                 mode="contained"
                 onPress={() => {
                   /* Implement language change logic */
@@ -47,34 +51,35 @@ const SettingsScreen = () => {
           />
           <List.Item
             title="Чорна тема"
-            titleStyle={styles.title}
+            titleStyle={[styles.title, { color: theme.textColor }]}
             right={() => (
               <Switch
                 value={theme === darkTheme}
-                color="#78C599"
+                thumbColor={isMuted ? "#ffffff" : "#000000"}
+                trackColor={{ false: "#767577", true: "green" }}
                 onValueChange={toggleTheme}
               />
             )}
           />
-
           <List.Item
             title="Вимкнути звук"
-            titleStyle={styles.title}
+            titleStyle={[styles.title, { color: theme.textColor }]}
             right={() => (
               <Switch
                 value={isMuted}
-                color="#78C599"
+                thumbColor={isMuted ? "#ffffff" : "#000000"}
+                trackColor={{ false: "green", true: "green" }}
                 onValueChange={toggleMute}
               />
             )}
           />
           <List.Item
             title="Вийти"
-            titleStyle={styles.title}
+            titleStyle={[styles.title, { color: theme.textColor }]}
             right={() => (
               <Button
-                style={styles.button}
-                labelStyle={styles.buttonText}
+                style={[styles.button, { backgroundColor: theme.buttonColor }]}
+                labelStyle={[styles.buttonText, { color: theme.textColor }]}
                 mode="contained"
                 onPress={handleLogout}
               >
@@ -97,7 +102,7 @@ const styles = StyleSheet.create({
   },
   container: {
     alignItems: "center",
-    backgroundColor: "#fff",
+
     padding: 20,
     height: 500,
     width: 370,

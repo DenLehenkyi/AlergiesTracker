@@ -15,8 +15,6 @@ const Stack = createStackNavigator();
 
 
 function App() {
-
-
   return (
     <ThemeProvider>
       <NavigationContainer>

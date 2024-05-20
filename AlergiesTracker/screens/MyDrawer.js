@@ -4,7 +4,13 @@ import { StyleSheet, View, Text } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useContext } from "react";
+import lightTheme from "../themes/lightTheme";
+import darkTheme from "../themes/darkTheme";
+import ThemeContext from "../Context/ThemeContext";
+
 const MyDrawer = ({ loadTheme, saveTheme }) => {
+  const { theme, toggleTheme } = useContext(ThemeContext);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const navigation = useNavigation();
 
@@ -14,16 +20,18 @@ const MyDrawer = ({ loadTheme, saveTheme }) => {
 
   return (
     <>
-      <Appbar.Header style={styles.header} elevation={0}>
-        <Appbar.Action icon="menu" onPress={toggleDrawer} />
-        <Appbar.Content title="Alergies Tracker" />
+      <Appbar.Header style={[styles.header, {backgroundColor: theme.backgroundColor}]} elevation={0}>
+        <Appbar.Action icon="menu" onPress={toggleDrawer} color={theme.textColor} />
+        <Appbar.Content title="Alergies Tracker" color={theme.textColor}/>
       </Appbar.Header>
       {drawerOpen && (
-        <View style={styles.drawerSection}>
+        <View style={[styles.drawerSection, {backgroundColor: theme.backgroundColor}]}>
           <Drawer.Item
             label="Головна"
+           
             onPress={() => navigation.navigate("Home")}
             style={styles.drawerItem}
+            labelStyle={{ color: theme.textColor }}
             icon={() => (
               <MaterialIcons
                 name="home"

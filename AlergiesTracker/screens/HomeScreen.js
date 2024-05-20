@@ -6,20 +6,25 @@ import { MaterialIcons } from "@expo/vector-icons"; // Потрібно вста
 import MyDrawer from "./MyDrawer";
 import { useNavigation } from "@react-navigation/native";
 import AddAllergyScreen from "./AddAllergyScreen";
+import { useContext } from "react";
+import lightTheme from "../themes/lightTheme";
+import darkTheme from "../themes/darkTheme";
+import ThemeContext from "../Context/ThemeContext";
 
 export default function HomeScreen() {
+  const { theme, toggleTheme } = useContext(ThemeContext);
   const [userData, setUserData] = useState(null);
   const navigation = useNavigation();
 
   return (
     <>
       <MyDrawer />
-      <View style={styles.container}>
+      <View style={[styles.container, {backgroundColor:theme.backgroundColor}]}>
         <TouchableRipple
-          style={styles.button}
+          style={[styles.button, {backgroundColor:theme.buttonColor }]}
           onPress={() => navigation.navigate('AddAllergy')}
         >
-          <Text style={styles.buttonText}>Додати алергію</Text>
+          <Text style={[styles.buttonText, {color: theme.textColor}]}>Додати алергію</Text>
         </TouchableRipple>
   
       </View>

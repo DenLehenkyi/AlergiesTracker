@@ -5,8 +5,13 @@ import Svg, { Path } from "react-native-svg";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect } from "react";
+import { useContext } from "react";
+import lightTheme from "../themes/lightTheme";
+import darkTheme from "../themes/darkTheme";
+import ThemeContext from "../Context/ThemeContext";
 
 export default function AuthScreen() {
+  const { theme, toggleTheme } = useContext(ThemeContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isRegister, setIsRegister] = useState(false);

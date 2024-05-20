@@ -3,8 +3,13 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MaterialIcons } from "@expo/vector-icons"; // Потрібно встановити expo/vector-icons
 import MyDrawer from "./MyDrawer";
+import { useContext } from "react";
+import lightTheme from "../themes/lightTheme";
+import darkTheme from "../themes/darkTheme";
+import ThemeContext from "../Context/ThemeContext";
 
 export default function ProfileScreen() {
+  const { theme, toggleTheme } = useContext(ThemeContext);
   const [userData, setUserData] = useState(null);
 
   useEffect(() => {
@@ -24,7 +29,7 @@ export default function ProfileScreen() {
 
   const handleLogout = async () => {
     try {
-     // await AsyncStorage.removeItem("userData");
+      // await AsyncStorage.removeItem("userData");
       setUserData(null);
     } catch (error) {
       console.error("Помилка при видаленні даних з AsyncStorage:", error);
@@ -33,36 +38,62 @@ export default function ProfileScreen() {
 
   return (
     <>
-    <MyDrawer></MyDrawer>
-    <View style={styles.container}>
-      {userData ? (
-        <View style={styles.userDataContainer}>
-          <MaterialIcons
-            name="person"
-            size={50}
-            color="black"
-            style={styles.icon}
-          />
-          <View style={styles.userInfoField}>
-            <Text style={styles.fieldLabel}>Ім'я:</Text>
-            <Text style={styles.fieldValue}>{userData.name}</Text>
+      <MyDrawer></MyDrawer>
+      <View
+        style={[styles.container, { backgroundColor: theme.backgroundColor }]}
+      >
+        {userData ? (
+          <View
+            style={[
+              styles.userDataContainer,
+              { backgroundColor: theme.lightGreen },
+            ]}
+          >
+            <MaterialIcons
+              name="person"
+              size={50}
+              color={theme.textColor}
+              style={styles.icon}
+            />
+            <View style={styles.userInfoField}>
+              <Text style={[styles.fieldLabel, { color: theme.buttonColor }]}>
+                Ім'я:
+              </Text>
+              <Text style={[styles.fieldValue, { color: theme.textColor }]}>
+                {userData.name}
+              </Text>
+            </View>
+            <View style={styles.userInfoField}>
+              <Text style={[styles.fieldLabel, { color: theme.buttonColor }]}>
+                Прізвище:
+              </Text>
+              <Text style={[styles.fieldValue, { color: theme.textColor }]}>
+                {userData.surname}
+              </Text>
+            </View>
+            <View style={styles.userInfoField}>
+              <Text style={[styles.fieldLabel, { color: theme.buttonColor }]}>
+                Email:
+              </Text>
+              <Text style={[styles.fieldValue, { color: theme.textColor }]}>
+                {userData.email}
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={handleLogout}
+              style={[styles.button, { backgroundColor: theme.buttonColor }]}
+            >
+              <Text style={[styles.buttonText, { color: theme.textColor }]}>
+                Вийти
+              </Text>
+            </TouchableOpacity>
           </View>
-          <View style={styles.userInfoField}>
-            <Text style={styles.fieldLabel}>Прізвище:</Text>
-            <Text style={styles.fieldValue}>{userData.surname}</Text>
-          </View>
-          <View style={styles.userInfoField}>
-            <Text style={styles.fieldLabel}>Email:</Text>
-            <Text style={styles.fieldValue}>{userData.email}</Text>
-          </View>
-          <TouchableOpacity onPress={handleLogout} style={styles.button}>
-            <Text style={styles.buttonText}>Вийти</Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
-        <Text>Немає даних про користувача</Text>
-      )}
-    </View>
+        ) : (
+          <Text style={{ color: theme.textColor }}>
+            Немає даних про користувача
+          </Text>
+        )}
+      </View>
     </>
   );
 }
@@ -85,6 +116,7 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     justifyContent: "center",
     backgroundColor: "#E2FFE6",
+    
   },
   userInfoField: {
     flexDirection: "row",

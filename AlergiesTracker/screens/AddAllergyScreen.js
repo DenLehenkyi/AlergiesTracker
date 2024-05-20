@@ -4,41 +4,40 @@ import { StyleSheet, View, Text, ScrollView } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import MyDrawer from "./MyDrawer";
 import { Rect } from "react-native-svg";
-
+import { useContext } from "react";
+import lightTheme from "../themes/lightTheme";
+import darkTheme from "../themes/darkTheme";
+import ThemeContext from "../Context/ThemeContext";
 
 import ProductsGrid from "../components/ProductsGrid";
 import Categories from "../components/Categories";
 
 export default AddAllergyScreeen = () => {
-    const [showCategories, setShowCategories] = React.useState(false);
-    const [chosenProducts, setChosenProducts] = React.useState([]);
-    React.useEffect(() => {
-      setChosenProducts([]);
-    }, []);
-    const toggleCategories = (product) => {
-      setChosenProducts((prevProducts) => {
-        if (prevProducts.some((p) => p.name === product.name)) {
-          return prevProducts;
-        }
-        return [...prevProducts, product];
-      });
+  const { theme, toggleTheme } = useContext(ThemeContext);
+  const [showCategories, setShowCategories] = React.useState(false);
+  const [chosenProducts, setChosenProducts] = React.useState([]);
+  React.useEffect(() => {
+    setChosenProducts([]);
+  }, []);
+  const toggleCategories = (product) => {
+    setChosenProducts((prevProducts) => {
+      if (prevProducts.some((p) => p.name === product.name)) {
+        return prevProducts;
+      }
+      return [...prevProducts, product];
+    });
 
-        setShowCategories(true);
-        console.log(showCategories);
-      };
+    setShowCategories(true);
+    console.log(showCategories);
+  };
   return (
     <>
       <MyDrawer />
-      <ScrollView style={styles.container}>
-        <Text style={styles.text}>Додайте алерген</Text>
-        <ProductsGrid oncklick={toggleCategories}/>
+      <ScrollView style={[styles.container,{backgroundColor: theme.backgroundColor}]}>
+        <Text style={[styles.text, {color:theme.textColor}]}>Додайте алерген</Text>
+        <ProductsGrid oncklick={toggleCategories} />
         {console.log(chosenProducts)}
-        {showCategories && (
-            <Categories products={chosenProducts}></Categories>
-        )
-            
-        }
-   
+        {showCategories && <Categories products={chosenProducts}></Categories>}
       </ScrollView>
     </>
   );
