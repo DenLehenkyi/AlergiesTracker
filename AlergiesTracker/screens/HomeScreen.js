@@ -19,7 +19,7 @@ export default function HomeScreen() {
   return (
     <>
       <MyDrawer />
-      <View style={[styles.container, {backgroundColor:theme.backgroundColor}]}>
+      <View style={[styles.container, {backgroundColor:theme.backgroundColor}, {fontFamily:theme.font}]}>
         <TouchableRipple
           style={[styles.button, {backgroundColor:theme.buttonColor }]}
           onPress={() => navigation.navigate('AddAllergy')}
@@ -51,6 +51,6 @@ const styles = StyleSheet.create({
     color: "black",
     fontSize: 16,
     fontWeight: "bold",
-    fontFamily: "Comfortaa-VariableFont_wght",
+    
   },
 });
