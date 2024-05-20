@@ -3,14 +3,17 @@ import { View, StyleSheet } from "react-native";
 import { List, Switch, Button } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "@rneui/themed";
+
 const SettingsScreen = () => {
-  const { theme, updateTheme } = useTheme();
-  
-  const [isDarkTheme, setIsDarkTheme] = useState(false);
+  const { theme,lightTheme, darkTheme, updateTheme } = useTheme();
+
   const [isMuted, setIsMuted] = useState(false);
   const navigation = useNavigation();
 
-  const toggleTheme = () => setIsDarkTheme(!isDarkTheme);
+  const toggleTheme = () =>
+    updateTheme(theme === lightTheme ? darkTheme : lightTheme);
+  
+  
   const toggleMute = () => setIsMuted(!isMuted);
 
   const handleLogout = () => {
@@ -43,11 +46,12 @@ const SettingsScreen = () => {
             title="Чорна тема"
             titleStyle={styles.title}
             right={() => (
-              <Switch
-                value={isDarkTheme}
+                <Switch
+                value={theme === darkTheme}
                 color="#8BDBAD"
                 onValueChange={toggleTheme}
               />
+              
             )}
           />
           <List.Item
