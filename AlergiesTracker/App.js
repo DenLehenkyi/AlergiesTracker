@@ -10,51 +10,15 @@ import HomeScreen from "./screens/HomeScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import { View, StyleSheet } from 'react-native';
-import { ThemeProvider } from '@rneui/themed';
-import { createTheme } from "@rneui/themed";
-
+import { ThemeProvider } from "./Context/ThemeContext";
 const Stack = createStackNavigator();
 
-const lightTheme = createTheme({
-  colors: {
-    primary: 'white',
-    // Add other colors here
-  },
-  components: {
-    Button: {
-      raised: true,
-    },
-  },
-});
-
-// Create a dark theme
-const darkTheme = createTheme({
-  colors: {
-    primary: 'black',
-    // Add other colors here
-  },
-  components: {
-    Button: {
-      raised: true,
-    },
-  },
-});
 
 function App() {
-  const [theme, setTheme] = useState(Appearance.getColorScheme() === 'dark' ? darkTheme : lightTheme);
 
-  useEffect(() => {
-    const subscription = Appearance.addChangeListener(({ colorScheme }) => {
-      setTheme(colorScheme === 'dark' ? darkTheme : lightTheme);
-    });
-
-    return () => {
-      subscription.remove();
-    };
-  }, []);
 
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider>
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Login">
           <Stack.Screen name="Login" component={LoginScreen} />

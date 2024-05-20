@@ -1,19 +1,20 @@
 import React, { useState } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 import { List, Switch, Button } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "@rneui/themed";
-
+import { useContext } from "react";
+import lightTheme from "../themes/lightTheme";
+import darkTheme from "../themes/darkTheme";
+import ThemeContext from "../Context/ThemeContext";
 const SettingsScreen = () => {
-  const { theme,lightTheme, darkTheme, updateTheme } = useTheme();
-
+  const { theme, toggleTheme } = useContext(ThemeContext);
+  const [isDarkTheme, setIsDarkTheme] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const navigation = useNavigation();
 
-  const toggleTheme = () =>
-    updateTheme(theme === lightTheme ? darkTheme : lightTheme);
-  
-  
+  //const toggleTheme = () => setIsDarkTheme(!isDarkTheme);
+
   const toggleMute = () => setIsMuted(!isMuted);
 
   const handleLogout = () => {
@@ -23,7 +24,9 @@ const SettingsScreen = () => {
 
   return (
     <View style={styles.mainContainer}>
-      <View style={styles.container}>
+      <View
+        style={[styles.container, { backgroundColor: theme.backgroundColor }]}
+      >
         <List.Section>
           <List.Subheader>Налаштування</List.Subheader>
           <List.Item
@@ -46,21 +49,21 @@ const SettingsScreen = () => {
             title="Чорна тема"
             titleStyle={styles.title}
             right={() => (
-                <Switch
+              <Switch
                 value={theme === darkTheme}
-                color="#8BDBAD"
+                color="#78C599"
                 onValueChange={toggleTheme}
               />
-              
             )}
           />
+
           <List.Item
             title="Вимкнути звук"
             titleStyle={styles.title}
             right={() => (
               <Switch
                 value={isMuted}
-                color="#8BDBAD"
+                color="#78C599"
                 onValueChange={toggleMute}
               />
             )}
