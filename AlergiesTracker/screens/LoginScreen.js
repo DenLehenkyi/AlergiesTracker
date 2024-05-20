@@ -4,6 +4,8 @@ import styled from "styled-components/native";
 import Svg, { Path } from "react-native-svg";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
+import { useEffect } from "react";
+
 export default function AuthScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -11,6 +13,21 @@ export default function AuthScreen() {
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
   const navigation = useNavigation();
+  useEffect(() => {
+    checkIfLoggedIn();
+  }, []);
+  const checkIfLoggedIn = async () => {
+    try {
+      const userDataKey = `userData`;
+      const userData = await AsyncStorage.getItem(userDataKey);
+      if (userData) {
+        navigation.navigate("Home");
+      }
+    } catch (error) {
+      console.error("Помилка перевірки авторизації:", error);
+    }
+  };
+
   const handleLogin = async () => {
     try {
       const userDataKey = `userData`; // Створюємо унікальний ключ для кожного користувача

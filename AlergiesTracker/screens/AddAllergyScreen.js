@@ -8,20 +8,17 @@ import G from "react-native-svg";
 import ProductsGrid from "../ProductsGrid";
 
 export default AddAllergyScreeen = () => {
-    const [showCategories, setShowCategories] = React.useState(false);
-    const [chosenProducts, setChosenProducts] = React.useState([]);
-    const toggleCategories = (product) => {
-        setChosenProducts(prevProducts => [...prevProducts, product]);
-        console.log(chosenProducts);
-        setShowCategories(true);
-      };
+  const [showCategories, setShowCategories] = React.useState(false);
+  const [chosenProducts, setChosenProducts] = React.useState([]);
+  const toggleCategories = (product) => {
+    setShowCategories(true);
+  };
   return (
     <>
       <MyDrawer />
       <ScrollView style={styles.container}>
         <Text style={styles.text}>Додайте алерген</Text>
-        <ProductsGrid oncklick={toggleCategories}/>
-   
+        <ProductsGrid oncklick={toggleCategories} />
       </ScrollView>
     </>
   );
@@ -45,8 +42,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 30,
     marginBottom: 50,
-    marginLeft:20
-
+    marginLeft: 20,
   },
   product: {
     width: 88,
@@ -62,7 +58,6 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-
   },
 
   name: {

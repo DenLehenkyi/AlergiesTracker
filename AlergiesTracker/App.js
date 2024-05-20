@@ -8,16 +8,32 @@ import LoginScreen from "./screens/LoginScreen";
 import HomeScreen from "./screens/HomeScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 import ProfileScreen from "./screens/ProfileScreen";
+import { View, StyleSheet } from 'react-native';
+import { ThemeProvider } from '@rneui/themed';
+import { createTheme } from "@rneui/themed";
 
 const Stack = createStackNavigator();
 
+const theme = createTheme({
+  lightColors: {
+    primary: 'red',
+  },
+  darkColors: {
+    primary: 'blue',
+  },
+  components: {
+    Button: {
+      raised: true,
+    },
+  },
+});
 function App() {
-  useEffect(() => {
-    let fontName = 'Comfortaa-Regular';
-    GlobalFont.applyGlobal(fontName);
-  }, []);
+
+
 
   return (
+    <ThemeProvider theme={theme}>
+      
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
         <Stack.Screen name="Login" component={LoginScreen} />
@@ -25,9 +41,10 @@ function App() {
         <Stack.Screen name="Profile" component={ProfileScreen} />
         <Stack.Screen name="Settings" component={SettingsScreen} />
         <Stack.Screen name="AddAllergy" component={AddAllergyScreen} />
-        {/* <Stack.Screen name="AllergyDetail" component={AllergyDetailScreen} />  */}
       </Stack.Navigator>
     </NavigationContainer>
+    
+    </ThemeProvider>
   );
 }
 

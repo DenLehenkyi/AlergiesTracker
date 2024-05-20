@@ -492,13 +492,13 @@ const styles = StyleSheet.create({
     allProducts: {
         flexDirection: "row",
         flexWrap: "wrap",
-        gap: 30,
+        gap:40,
         marginBottom: 50,
         marginLeft:20
     
       },
       product: {
-        width: 88,
+        width: 80,
         height: 110,
         borderRadius: 15,
         backgroundColor: "#E2FFE6",
