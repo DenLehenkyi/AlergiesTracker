@@ -2,30 +2,52 @@ import React, { useState } from "react";
 import { Text, TextInput, View } from "react-native";
 import styled from "styled-components/native";
 import Svg, { Path } from "react-native-svg";
-import MyDrawer from "./MyDrawer";
-import { PaperProvider } from "react-native-paper";
-
-export default function AuthScreen({ navigation }) {
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
+export default function AuthScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isRegister, setIsRegister] = useState(false);
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
-
-  const handleLogin = () => {
-    // Логіка для логіну
-    navigation.navigate("Home");
+  const navigation = useNavigation();
+  const handleLogin = async () => {
+    try {
+      const userData = await AsyncStorage.getItem(email);
+      if (userData) {
+        const savedData = JSON.parse(userData);
+        if (savedData.password === password) {
+          navigation.navigate("Home");
+        } else {
+          Alert.alert("Помилка", "Невірний пароль");
+        }
+      } else {
+        Alert.alert("Помилка", "Користувача з таким email не існує");
+      }
+    } catch (error) {
+      console.error("Помилка при вході:", error);
+    }
   };
 
-  const handleRegister = () => {
-    // Логіка для реєстрації
-    navigation.navigate("Home");
-  };
+  const handleRegister = async () => {
+    try {
+      const existingUser = await AsyncStorage.getItem(email);
+      if (existingUser) {
+        Alert.alert("Помилка", "Користувач з таким email вже зареєстрований");
+      } else {
+        await AsyncStorage.setItem(
+          "userData", // Використовуйте "userData" як ключ
+          JSON.stringify({ name, surname, email, password }) // Збереження даних користувача під ключем "userData"
+        );
+        navigation.navigate("Home");
+      }
+    } catch (error) {
+      console.error("Помилка при реєстрації:", error);
+    }
+  }; 
 
   return (
     <>
-  
-       
       {/* <StyledTitle>Alergies Tracker</StyledTitle> */}
       {isRegister ? (
         <StyledForm>
@@ -133,7 +155,7 @@ export default function AuthScreen({ navigation }) {
           <EmailDiv>
             <IconWrapper>
               <EmailIcon
-               width="18.11"
+                width="18.11"
                 height="14"
                 viewBox="0 0 21 14"
                 fill="none"
@@ -155,7 +177,7 @@ export default function AuthScreen({ navigation }) {
           <EmailDiv>
             <IconWrapper>
               <EmailIcon
-               width="18.11"
+                width="18.11"
                 height="23"
                 viewBox="0 0 19 23"
                 fill="none"
@@ -212,7 +234,7 @@ const IconWrapper = styled(View)`
   background: rgba(139, 219, 173, 1);
   border-radius: 15px;
   position: absolute;
-  z-index:1;
+  z-index: 1;
   margin-left: 53px;
   border-width: 1px;
   border-color: #ccc;
