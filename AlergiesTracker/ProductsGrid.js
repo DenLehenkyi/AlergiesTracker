@@ -6,7 +6,7 @@ import Svg, { Path } from "react-native-svg";
 const ProductsGrid = ({oncklick}) => {
   return (
     <View style={styles.allProducts}>
-    <View style={styles.product}>
+    <View style={styles.product} onPress={() => {oncklick}}>
       <Svg
         width="61"
         height="59"

@@ -11,10 +11,10 @@ export default AddAllergyScreeen = () => {
     const [showCategories, setShowCategories] = React.useState(false);
     const [chosenProducts, setChosenProducts] = React.useState([]);
     const toggleCategories = (product) => {
+        setChosenProducts(prevProducts => [...prevProducts, product]);
+        console.log(chosenProducts);
         setShowCategories(true);
-        
-
-    }
+      };
   return (
     <>
       <MyDrawer />
