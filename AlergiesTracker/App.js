@@ -11,6 +11,7 @@ import SettingsScreen from "./screens/SettingsScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import { View, StyleSheet } from 'react-native';
 import { ThemeProvider } from "./Context/ThemeContext";
+import AddSymptomsScreen from "./screens/AddSymptomsScreen";
 const Stack = createStackNavigator();
 
 
@@ -24,6 +25,7 @@ function App() {
           <Stack.Screen name="Profile" component={ProfileScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
           <Stack.Screen name="AddAllergy" component={AddAllergyScreen} />
+          <Stack.Screen name="AddSymptoms" component={AddSymptomsScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </ThemeProvider>

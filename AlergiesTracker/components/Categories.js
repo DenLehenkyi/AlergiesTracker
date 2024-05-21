@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import { Button } from "react-native-paper";
+import { useNavigation } from "@react-navigation/native";
 
 const Categories = ({ products }) => {
+    const navigation = useNavigation();
   const [selectedCategories, setSelectedCategories] = useState({});
 
   const handleSelectCategory = (itemIndex, category) => {
@@ -86,7 +88,7 @@ const Categories = ({ products }) => {
           ))}
 
       </View>
-      <Button style={styles.button} labelStyle={styles.buttonLabel}>Перейти до симптомів</Button>
+      <Button style={styles.button} labelStyle={styles.buttonLabel} onPress={() => navigation.navigate("AddSymptoms")}>Перейти до симптомів</Button>
     </ScrollView>
   );
 };
