@@ -1,7 +1,23 @@
-import React from "react";
+import React, { useContext } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { supabase } from "../lib/supabase";
 import { Session } from '@supabase/supabase-js';
+import EggSvg from "../assets/svgs/egg";
+import NutsSvg from "../assets/svgs/nuts";
+import ZernoSvg from "../assets/svgs/zerno";
+import FishSvg from "../assets/svgs/fish";
+import ChocolateSvg from "../assets/svgs/chocolate";
+import VegetablesSvg from "../assets/svgs/vegetables";
+import FruitsSvg from "../assets/svgs/fruits";
+import HoneySvg from "../assets/svgs/honey";
+import PylokSvg from "../assets/svgs/pylok";
+import AnimalsSvg from "../assets/svgs/animals";
+import KlishchiSvg from "../assets/svgs/klishchi";
+import PlisniavaSvg from "../assets/svgs/plisniava";
+import InsectsSvg from "../assets/svgs/insects";
+import DrugsSvgs from "../assets/svgs/drugs";
+import { useState } from "react";
+import { useEffect } from "react";
 
 
 const ProductsArray = [
@@ -22,6 +38,7 @@ const ProductsArray = [
 ];
 
 const ProductsGrid = ({ onClick, selectedProducts }) => {
+
   const [session, setSession] = useState(null);
 
   useEffect(() => {

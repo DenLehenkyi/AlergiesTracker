@@ -10,9 +10,11 @@ import { useContext } from "react";
 import lightTheme from "../themes/lightTheme";
 import darkTheme from "../themes/darkTheme";
 import ThemeContext from "../Context/ThemeContext";
+import LanguageContext from "../Context/LanguageContext";
 
 export default function HomeScreen() {
   const { theme, toggleTheme } = useContext(ThemeContext);
+  const {language, toggleLanguage} = useContext(LanguageContext);
   const [userData, setUserData] = useState(null);
   const navigation = useNavigation();
 
@@ -24,7 +26,7 @@ export default function HomeScreen() {
           style={[styles.button, {backgroundColor:theme.buttonColor }]}
           onPress={() => navigation.navigate('AddAllergy')}
         >
-          <Text style={[styles.buttonText, {color: theme.textColor}]}>Додати алергію</Text>
+          <Text style={[styles.buttonText, {color: theme.textColor}]}>{language === "ua" ? "Додати алергію" : "Add allergy"}</Text>
         </TouchableRipple>
   
       </View>

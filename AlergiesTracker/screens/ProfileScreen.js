@@ -4,9 +4,11 @@ import { MaterialIcons } from "@expo/vector-icons";
 import MyDrawer from "./MyDrawer";
 import ThemeContext from "../Context/ThemeContext";
 import { supabase } from "../lib/supabase"; // Adjust the path according to your project structure
+import LanguageContext from "../Context/LanguageContext";
 
 export default function ProfileScreen() {
   const { theme } = useContext(ThemeContext);
+  const {language, toggleLanguage} = useContext(LanguageContext);
   const [userData, setUserData] = useState(null);
   const [session, setSession] = useState(null);
 
@@ -68,22 +70,22 @@ export default function ProfileScreen() {
           <View style={[styles.userDataContainer, { backgroundColor: theme.lightGreen }]}>
             <MaterialIcons name="person" size={50} color={theme.textColor} style={styles.icon} />
             <View style={styles.userInfoField}>
-              <Text style={[styles.fieldLabel, { color: theme.buttonColor }]}>Пошта:</Text>
+              <Text style={[styles.fieldLabel, { color: theme.buttonColor }]}>{language === "ua" ? "Пошта:" : "Email"}</Text>
               <Text style={[styles.fieldValue, { color: theme.textColor }]}>{userData.username}</Text>
             </View>
             <View style={styles.userInfoField}>
-              <Text style={[styles.fieldLabel, { color: theme.buttonColor }]}>Ім'я:</Text>
+              <Text style={[styles.fieldLabel, { color: theme.buttonColor }]}>{language === "ua" ? "Ім'я:" : "Name"}</Text>
               <Text style={[styles.fieldValue, { color: theme.textColor }]}>{userData.username}</Text>
             </View>
             <View style={styles.userInfoField}>
-              <Text style={[styles.fieldLabel, { color: theme.buttonColor }]}>Прізвище:</Text>
+              <Text style={[styles.fieldLabel, { color: theme.buttonColor }]}>{language === "ua" ? "Прізвище" : "Surname"}</Text>
               <Text style={[styles.fieldValue, { color: theme.textColor }]}>{userData.full_name}</Text>
             </View>
             <TouchableOpacity
               onPress={handleLogout}
               style={[styles.button, { backgroundColor: theme.buttonColor }]}
             >
-              <Text style={[styles.buttonText, { color: theme.textColor }]}>Вийти</Text>
+              <Text style={[styles.buttonText, { color: theme.textColor }]}>{language === "ua" ? "Вийти з акаунту" : "Logout"}</Text>
             </TouchableOpacity>
           </View>
         ) : (
