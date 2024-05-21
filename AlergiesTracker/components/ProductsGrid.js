@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { supabase } from "../lib/supabase";
-import { Session } from '@supabase/supabase-js';
+import { Session } from "@supabase/supabase-js";
 import EggSvg from "../assets/svgs/egg";
 import NutsSvg from "../assets/svgs/nuts";
 import ZernoSvg from "../assets/svgs/zerno";
@@ -16,34 +16,58 @@ import KlishchiSvg from "../assets/svgs/klishchi";
 import PlisniavaSvg from "../assets/svgs/plisniava";
 import InsectsSvg from "../assets/svgs/insects";
 import DrugsSvgs from "../assets/svgs/drugs";
-import { useState } from "react";
-import { useEffect } from "react";
-
+import { useState, useEffect } from "react";
 
 const ProductsArray = [
   { name: "Яйця", svg: EggSvg, subcategories: ["Білок", "Жовток"] },
-  { name: "Горіхи", svg: NutsSvg, subcategories: ["Мигдаль", "Фундук", "Грецький горіх", "Арахіс"] },
-  { name: "Зернові", svg: ZernoSvg, subcategories: ["Пшениця", "Жито", "Ячмінь"] },
-  { name: "Море-продукти", svg: FishSvg, subcategories: ["Риба", "Креветки", "Мідії"] },
-  { name: "Шоколад", svg: ChocolateSvg, subcategories: ["Темний шоколад", "Молочний шоколад"] },
-  { name: "Овочі", svg: VegetablesSvg, subcategories: ["Морква", "Картопля", "Буряк"] },
-  { name: "Фрукти", svg: FruitsSvg, subcategories: ["Яблука", "Банани", "Цитрусові"] },
+  {
+    name: "Горіхи",
+    svg: NutsSvg,
+    subcategories: ["Мигдаль", "Фундук", "Грецький горіх", "Арахіс"],
+  },
+  {
+    name: "Зернові",
+    svg: ZernoSvg,
+    subcategories: ["Пшениця", "Жито", "Ячмінь"],
+  },
+  {
+    name: "Море-продукти",
+    svg: FishSvg,
+    subcategories: ["Риба", "Креветки", "Мідії"],
+  },
+  {
+    name: "Шоколад",
+    svg: ChocolateSvg,
+    subcategories: ["Темний шоколад", "Молочний шоколад"],
+  },
+  {
+    name: "Овочі",
+    svg: VegetablesSvg,
+    subcategories: ["Морква", "Картопля", "Буряк"],
+  },
+  {
+    name: "Фрукти",
+    svg: FruitsSvg,
+    subcategories: ["Яблука", "Банани", "Цитрусові"],
+  },
   { name: "Мед", svg: HoneySvg, subcategories: [] },
   { name: "Пилок", svg: PylokSvg, subcategories: [] },
   { name: "Шерсть тварин", svg: AnimalsSvg, subcategories: ["Коти", "Собаки"] },
   { name: "Кліщі", svg: KlishchiSvg, subcategories: [] },
   { name: "Пліснява", svg: PlisniavaSvg, subcategories: [] },
   { name: "Комахи", svg: InsectsSvg, subcategories: ["Бджоли", "Оси"] },
-  { name: "Пеніцилін", svg: DrugsSvgs, subcategories: [] }
+  { name: "Пеніцилін", svg: DrugsSvgs, subcategories: [] },
 ];
 
-const ProductsGrid = ({ onClick, selectedProducts }) => {
-
+const ProductsGrid = ({ oncklick, selectedProducts }) => {
   const [session, setSession] = useState(null);
 
   useEffect(() => {
     async function fetchSession() {
-      const { data: { session }, error } = await supabase.auth.getSession();
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
       if (error) {
         console.error("Error fetching session:", error);
         return;
@@ -53,9 +77,11 @@ const ProductsGrid = ({ onClick, selectedProducts }) => {
 
     fetchSession();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session);
+      }
+    );
 
     return () => {
       authListener.subscription.unsubscribe();
@@ -63,20 +89,17 @@ const ProductsGrid = ({ onClick, selectedProducts }) => {
   }, []);
 
   const saveSelectedProducts = async (selectedProduct) => {
-    const userId = session.user.id; 
+    const userId = session.user.id;
 
-      const { data, error } = await supabase
-        .from('allergy')
-        .insert([
-          { user_id: userId, product_id: selectedProduct.name }
-        ]);
+    const { data, error } = await supabase
+      .from("allergy")
+      .insert([{ user_id: userId, name: selectedProduct.name }]);
 
-      if (error) {
-        console.error("Error inserting data:", error);
-      } else {
-        console.log("Data inserted successfully:", data);
-      }
-    
+    if (error) {
+      console.error("Error inserting data:", error);
+    } else {
+      console.log("Data inserted successfully:", data);
+    }
   };
 
   return (
@@ -85,11 +108,12 @@ const ProductsGrid = ({ onClick, selectedProducts }) => {
         <TouchableOpacity
           style={[
             styles.product,
-            selectedProducts.some((p) => p.name === item.name) && styles.selectedProduct,
+            selectedProducts.some((p) => p.name === item.name) &&
+              styles.selectedProduct,
           ]}
           onPress={() => {
-            onClick(item);
-            saveSelectedProducts(item); // Збереження вибраного продукту
+            oncklick(item);
+            saveSelectedProducts([item]); // Збереження вибраного продукту
           }}
           key={index}
         >
