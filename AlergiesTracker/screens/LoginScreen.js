@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Text, TextInput, View } from "react-native";
+import { Text, TextInput, View, AppState } from "react-native";
 import styled from "styled-components/native";
 import Svg, { Path } from "react-native-svg";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -9,6 +9,21 @@ import { useContext } from "react";
 import lightTheme from "../themes/lightTheme";
 import darkTheme from "../themes/darkTheme";
 import ThemeContext from "../Context/ThemeContext";
+import { supabase } from "../lib/supabase";
+import { Alert } from "react-native";
+import AddName from "../components/AddName";
+import { Session } from '@supabase/supabase-js';
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scrollview";
+
+
+
+AppState.addEventListener("change", (state) => {
+  if (state === "active") {
+    supabase.auth.startAutoRefresh();
+  } else {
+    supabase.auth.stopAutoRefresh();
+  }
+});
 
 export default function AuthScreen() {
   const { theme, toggleTheme } = useContext(ThemeContext);
@@ -17,107 +32,128 @@ export default function AuthScreen() {
   const [isRegister, setIsRegister] = useState(false);
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
+
   const navigation = useNavigation();
+  const [loading, setLoading] = useState(false);
+  const [nameSet, setNameSet] = useState(false);
+  const [session, setSession] = useState(Session );
+
+
   useEffect(() => {
-    checkIfLoggedIn();
+    async function fetchSession() {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error("Error fetching session:", error);
+        return;
+      }
+      setSession(session);
+    }
+
+    fetchSession();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
   }, []);
-  const checkIfLoggedIn = async () => {
-    try {
-      const userDataKey = `userData`;
-      const userData = await AsyncStorage.getItem(userDataKey);
-      if (userData) {
-        navigation.navigate("Home");
-      }
-    } catch (error) {
-      console.error("Помилка перевірки авторизації:", error);
-    }
+
+
+  const hadleClick = () => {
+    setNameSet(true);
+    signUpWithEmail();
   };
 
-  const handleLogin = async () => {
-    try {
-      const userDataKey = `userData`; // Створюємо унікальний ключ для кожного користувача
-      const userData = await AsyncStorage.getItem(userDataKey);
-      if (userData) {
-        const savedData = JSON.parse(userData);
-        if (savedData.password === password) {
-          navigation.navigate("Home");
-        } else {
-          Alert.alert("Помилка", "Невірний пароль");
-        }
-      } else {
-        Alert.alert("Помилка", "Користувача з таким email не існує");
-      }
-    } catch (error) {
-      console.error("Помилка при вході:", error);
-    }
-  };
-  
+  // useEffect(() => {
+  //   checkIfLoggedIn();
+  // }, []);
+  // const checkIfLoggedIn = async () => {
+  //   try {
+  //     const userDataKey = `userData`;
+  //     const userData = await AsyncStorage.getItem(userDataKey);
+  //     if (userData) {
+  //       navigation.navigate("Home");
+  //     }
+  //   } catch (error) {
+  //     console.error("Помилка перевірки авторизації:", error);
+  //   }
+  // };
 
-  const handleRegister = async () => {
-    try {
-      const existingUser = await AsyncStorage.getItem(email);
-      if (existingUser) {
-        Alert.alert("Помилка", "Користувач з таким email вже зареєстрований");
-      } else {
-        await AsyncStorage.setItem(
-          "userData", // Використовуйте "userData" як ключ
-          JSON.stringify({ name, surname, email, password }) // Збереження даних користувача під ключем "userData"
-        );
-        navigation.navigate("Home");
-      }
-    } catch (error) {
-      console.error("Помилка при реєстрації:", error);
-    }
-  }; 
+  // const handleLogin = async () => {
+  //   try {
+  //     const userDataKey = `userData`; // Створюємо унікальний ключ для кожного користувача
+  //     const userData = await AsyncStorage.getItem(userDataKey);
+  //     if (userData) {
+  //       const savedData = JSON.parse(userData);
+  //       if (savedData.password === password) {
+  //         navigation.navigate("Home");
+  //       } else {
+  //         Alert.alert("Помилка", "Невірний пароль");
+  //       }
+  //     } else {
+  //       Alert.alert("Помилка", "Користувача з таким email не існує");
+  //     }
+  //   } catch (error) {
+  //     console.error("Помилка при вході:", error);
+  //   }
+  // };
 
+  // const handleRegister = async () => {
+  //   try {
+  //     const existingUser = await AsyncStorage.getItem(email);
+  //     if (existingUser) {
+  //       Alert.alert("Помилка", "Користувач з таким email вже зареєстрований");
+  //     } else {
+  //       await AsyncStorage.setItem(
+  //         "userData", // Використовуйте "userData" як ключ
+  //         JSON.stringify({ name, surname, email, password }) // Збереження даних користувача під ключем "userData"
+  //       );
+  //       navigation.navigate("Home");
+  //     }
+  //   } catch (error) {
+  //     console.error("Помилка при реєстрації:", error);
+  //   }
+  // };
+  async function signInWithEmail() {
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
+    });
+
+    if (error){
+      Alert.alert(error.message);
+    }
+    else{
+      navigation.navigate("Home");
+    }
+
+    setLoading(false);
+  }
+
+  async function signUpWithEmail() {
+    setLoading(true);
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+    });
+    // navigation.navigate("Home");
+    if (error) Alert.alert(error.message);
+    setLoading(false);
+  }
   return (
-    <>
-       <StyledTitle>Alergies Tracker</StyledTitle> 
+    <KeyboardAwareScrollView
+    contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
+    keyboardShouldPersistTaps="handled"
+  >
+      <StyledTitle>Alergies Tracker</StyledTitle>
       {isRegister ? (
         <StyledForm>
-          <EmailDiv>
-            <IconWrapper>
-              <EmailIcon
-                width="18.11"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <Path
-                  d="M10 2.375C10.3447 2.375 10.6861 2.4429 11.0045 2.57482C11.323 2.70673 11.6124 2.90009 11.8562 3.14384C12.0999 3.3876 12.2933 3.67698 12.4252 3.99546C12.5571 4.31394 12.625 4.65528 12.625 5C12.625 5.34472 12.5571 5.68606 12.4252 6.00454C12.2933 6.32302 12.0999 6.6124 11.8562 6.85616C11.6124 7.09991 11.323 7.29327 11.0045 7.42518C10.6861 7.5571 10.3447 7.625 10 7.625C9.30381 7.625 8.63613 7.34844 8.14384 6.85616C7.65156 6.36387 7.375 5.69619 7.375 5C7.375 4.30381 7.65156 3.63613 8.14384 3.14384C8.63613 2.65156 9.30381 2.375 10 2.375ZM10 13.625C13.7125 13.625 17.625 15.45 17.625 16.25V17.625H2.375V16.25C2.375 15.45 6.2875 13.625 10 13.625ZM10 0C7.2375 0 5 2.2375 5 5C5 7.7625 7.2375 10 10 10C12.7625 10 15 7.7625 15 5C15 2.2375 12.7625 0 10 0ZM10 11.25C6.6625 11.25 0 12.925 0 16.25V20H20V16.25C20 12.925 13.3375 11.25 10 11.25Z"
-                  fill="black"
-                />
-              </EmailIcon>
-            </IconWrapper>
-            <StyledTextInput
-              value={name}
-              onChangeText={setName}
-              placeholder="Введіть ім'я"
-            />
-          </EmailDiv>
-
-          <EmailDiv>
-            <IconWrapper>
-              <EmailIcon
-                width="18.11"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <Path
-                  d="M10 2.375C10.3447 2.375 10.6861 2.4429 11.0045 2.57482C11.323 2.70673 11.6124 2.90009 11.8562 3.14384C12.0999 3.3876 12.2933 3.67698 12.4252 3.99546C12.5571 4.31394 12.625 4.65528 12.625 5C12.625 5.34472 12.5571 5.68606 12.4252 6.00454C12.2933 6.32302 12.0999 6.6124 11.8562 6.85616C11.6124 7.09991 11.323 7.29327 11.0045 7.42518C10.6861 7.5571 10.3447 7.625 10 7.625C9.30381 7.625 8.63613 7.34844 8.14384 6.85616C7.65156 6.36387 7.375 5.69619 7.375 5C7.375 4.30381 7.65156 3.63613 8.14384 3.14384C8.63613 2.65156 9.30381 2.375 10 2.375ZM10 13.625C13.7125 13.625 17.625 15.45 17.625 16.25V17.625H2.375V16.25C2.375 15.45 6.2875 13.625 10 13.625ZM10 0C7.2375 0 5 2.2375 5 5C5 7.7625 7.2375 10 10 10C12.7625 10 15 7.7625 15 5C15 2.2375 12.7625 0 10 0ZM10 11.25C6.6625 11.25 0 12.925 0 16.25V20H20V16.25C20 12.925 13.3375 11.25 10 11.25Z"
-                  fill="black"
-                />
-              </EmailIcon>
-            </IconWrapper>
-            <StyledTextInput
-              value={surname}
-              onChangeText={setSurname}
-              placeholder="Введіть прізвище"
-            />
-          </EmailDiv>
           <EmailDiv>
             <IconWrapper>
               <EmailIcon
@@ -162,11 +198,14 @@ export default function AuthScreen() {
               placeholder="Пароль"
             />
           </EmailDiv>
-
-          <LoginButton title="Register" onPress={handleRegister}>
-            <ButtonText>Зареєструватись</ButtonText>
+          <LoginButton onPress={hadleClick}>
+            <ButtonText>Продовжити</ButtonText>
           </LoginButton>
-
+          {nameSet && (
+            <>
+              <AddName session={session}/>
+            </>
+          )}
           <StyledDiv>
             <StyledText>Вже є обліковий запис?</StyledText>
             <TapRegister onPress={() => setIsRegister(false)}>
@@ -221,7 +260,7 @@ export default function AuthScreen() {
               placeholder="Пароль"
             />
           </EmailDiv>
-          <LoginButton title="Login" onPress={handleLogin}  >
+          <LoginButton title="Login" onPress={signInWithEmail}>
             <ButtonText>Увійти</ButtonText>
           </LoginButton>
           <StyledDiv>
@@ -232,12 +271,12 @@ export default function AuthScreen() {
           </StyledDiv>
         </StyledForm>
       )}
-    </>
+    </KeyboardAwareScrollView>
   );
 }
 
 const StyledForm = styled(View)`
-  margin-top: 110px;
+  margin-top: 10px;
   padding: 20px;
   margin-bottom: 50px;
 `;

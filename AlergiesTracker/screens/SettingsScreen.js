@@ -7,21 +7,26 @@ import { useContext } from "react";
 import lightTheme from "../themes/lightTheme";
 import darkTheme from "../themes/darkTheme";
 import ThemeContext from "../Context/ThemeContext";
+import { Session } from '@supabase/supabase-js'
+import { supabase } from "../lib/supabase";
 
 const SettingsScreen = () => {
+  const [session, setSession] = useState(Session);
   const { theme, toggleTheme } = useContext(ThemeContext);
  
   const [isDarkTheme, setIsDarkTheme] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const navigation = useNavigation();
+  
 
   //const toggleTheme = () => setIsDarkTheme(!isDarkTheme);
 
   const toggleMute = () => setIsMuted(!isMuted);
 
-  const handleLogout = () => {
-    // Implement your logout logic here
-    navigation.navigate("Login"); // Assuming you have a Login screen
+  const  handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigation.navigate("Login")
+
   };
 
   return (

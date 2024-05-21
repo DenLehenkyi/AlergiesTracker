@@ -1,97 +1,89 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { MaterialIcons } from "@expo/vector-icons"; // Потрібно встановити expo/vector-icons
+import { MaterialIcons } from "@expo/vector-icons";
 import MyDrawer from "./MyDrawer";
-import { useContext } from "react";
-import lightTheme from "../themes/lightTheme";
-import darkTheme from "../themes/darkTheme";
 import ThemeContext from "../Context/ThemeContext";
+import { supabase } from "../lib/supabase"; // Adjust the path according to your project structure
 
 export default function ProfileScreen() {
-  const { theme, toggleTheme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext);
   const [userData, setUserData] = useState(null);
+  const [session, setSession] = useState(null);
 
   useEffect(() => {
-    retrieveUserData();
+    async function fetchSession() {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error("Error fetching session:", error);
+        return;
+      }
+      setSession(session);
+    }
+
+    fetchSession();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
   }, []);
 
-  const retrieveUserData = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem("userData");
-      if (jsonValue !== null) {
-        setUserData(JSON.parse(jsonValue));
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (session && session.user) {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("username, full_name")
+          .eq("id", session.user.id)
+          .single();
+        if (data) {
+          setUserData(data);
+        } else if (error) {
+          console.error("Error fetching user data:", error);
+        }
       }
-    } catch (error) {
-      console.error("Помилка при отриманні даних з AsyncStorage:", error);
-    }
-  };
+    };
+
+    fetchUserData();
+  }, [session]);
 
   const handleLogout = async () => {
-    try {
-      // await AsyncStorage.removeItem("userData");
+    const { error } = await supabase.auth.signOut();
+    if (!error) {
       setUserData(null);
-    } catch (error) {
-      console.error("Помилка при видаленні даних з AsyncStorage:", error);
+      setSession(null);
+    } else {
+      console.error("Error logging out:", error);
     }
   };
 
   return (
     <>
-      <MyDrawer></MyDrawer>
-      <View
-        style={[styles.container, { backgroundColor: theme.backgroundColor }]}
-      >
+      <MyDrawer />
+      <View style={[styles.container, { backgroundColor: theme.backgroundColor }]}>
         {userData ? (
-          <View
-            style={[
-              styles.userDataContainer,
-              { backgroundColor: theme.lightGreen },
-            ]}
-          >
-            <MaterialIcons
-              name="person"
-              size={50}
-              color={theme.textColor}
-              style={styles.icon}
-            />
+          <View style={[styles.userDataContainer, { backgroundColor: theme.lightGreen }]}>
+            <MaterialIcons name="person" size={50} color={theme.textColor} style={styles.icon} />
             <View style={styles.userInfoField}>
-              <Text style={[styles.fieldLabel, { color: theme.buttonColor }]}>
-                Ім'я:
-              </Text>
-              <Text style={[styles.fieldValue, { color: theme.textColor }]}>
-                {userData.name}
-              </Text>
+              <Text style={[styles.fieldLabel, { color: theme.buttonColor }]}>Ім'я:</Text>
+              <Text style={[styles.fieldValue, { color: theme.textColor }]}>{userData.username}</Text>
             </View>
             <View style={styles.userInfoField}>
-              <Text style={[styles.fieldLabel, { color: theme.buttonColor }]}>
-                Прізвище:
-              </Text>
-              <Text style={[styles.fieldValue, { color: theme.textColor }]}>
-                {userData.surname}
-              </Text>
-            </View>
-            <View style={styles.userInfoField}>
-              <Text style={[styles.fieldLabel, { color: theme.buttonColor }]}>
-                Email:
-              </Text>
-              <Text style={[styles.fieldValue, { color: theme.textColor }]}>
-                {userData.email}
-              </Text>
+              <Text style={[styles.fieldLabel, { color: theme.buttonColor }]}>Прізвище:</Text>
+              <Text style={[styles.fieldValue, { color: theme.textColor }]}>{userData.full_name}</Text>
             </View>
             <TouchableOpacity
               onPress={handleLogout}
               style={[styles.button, { backgroundColor: theme.buttonColor }]}
             >
-              <Text style={[styles.buttonText, { color: theme.textColor }]}>
-                Вийти
-              </Text>
+              <Text style={[styles.buttonText, { color: theme.textColor }]}>Вийти</Text>
             </TouchableOpacity>
           </View>
         ) : (
-          <Text style={{ color: theme.textColor }}>
-            Немає даних про користувача
-          </Text>
+          <Text style={{ color: theme.textColor }}>Немає даних про користувача</Text>
         )}
       </View>
     </>
@@ -116,7 +108,6 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     justifyContent: "center",
     backgroundColor: "#E2FFE6",
-    
   },
   userInfoField: {
     flexDirection: "row",
