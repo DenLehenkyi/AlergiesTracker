@@ -17,7 +17,7 @@ import PlisniavaSvg from "../assets/svgs/plisniava";
 import InsectsSvg from "../assets/svgs/insects";
 import DrugsSvgs from "../assets/svgs/drugs";
 import { useState, useEffect } from "react";
-
+import LanguageContext from "../Context/LanguageContext";
 const ProductsArray = [
   { name: "Яйця", svg: EggSvg, subcategories: ["Білок", "Жовток"] },
   {
@@ -61,7 +61,7 @@ const ProductsArray = [
 
 const ProductsGrid = ({ oncklick, selectedProducts }) => {
   const [session, setSession] = useState(null);
-
+  const { translate } = useContext(LanguageContext);
   useEffect(() => {
     async function fetchSession() {
       const {
