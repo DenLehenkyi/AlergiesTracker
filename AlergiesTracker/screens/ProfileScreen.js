@@ -68,6 +68,10 @@ export default function ProfileScreen() {
           <View style={[styles.userDataContainer, { backgroundColor: theme.lightGreen }]}>
             <MaterialIcons name="person" size={50} color={theme.textColor} style={styles.icon} />
             <View style={styles.userInfoField}>
+              <Text style={[styles.fieldLabel, { color: theme.buttonColor }]}>Пошта:</Text>
+              <Text style={[styles.fieldValue, { color: theme.textColor }]}>{userData.username}</Text>
+            </View>
+            <View style={styles.userInfoField}>
               <Text style={[styles.fieldLabel, { color: theme.buttonColor }]}>Ім'я:</Text>
               <Text style={[styles.fieldValue, { color: theme.textColor }]}>{userData.username}</Text>
             </View>
@@ -93,6 +97,7 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#78C599",
@@ -102,7 +107,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 20,
     height: 500,
-    borderRadius: 10,
+    width:370,
+    borderRadius: 35,
     elevation: 5,
     borderWidth: 1,
     borderColor: "#ccc",

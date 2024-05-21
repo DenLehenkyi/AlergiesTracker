@@ -10,16 +10,19 @@ import SettingsScreen from "./screens/SettingsScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import AddSymptomsScreen from "./screens/AddSymptomsScreen";
 import { supabase } from "./lib/supabase";
-import { Session } from '@supabase/supabase-js'
-
+import { Session } from "@supabase/supabase-js";
+import { LanguageProvider } from "./Context/LanguageContext";
 const Stack = createStackNavigator();
 
 function App() {
-  const [session, setSession] = useState(Session );
+  const [session, setSession] = useState(Session);
 
   useEffect(() => {
     async function fetchSession() {
-      const { data: { session }, error } = await supabase.auth.getSession();
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
       if (error) {
         console.error("Error fetching session:", error);
         return;
@@ -29,9 +32,11 @@ function App() {
 
     fetchSession();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session);
+      }
+    );
 
     return () => {
       authListener.subscription.unsubscribe();
@@ -40,21 +45,22 @@ function App() {
 
   // console.log(session);
 
-
   return (
-    <ThemeProvider>
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName={session ? "Home" : "Login"}>
-        {/* <Stack.Navigator> */}
-          <Stack.Screen name="Login" component={LoginScreen}  />
-          <Stack.Screen name="Home" component={HomeScreen} />
-          <Stack.Screen name="Profile" component={ProfileScreen} />
-          <Stack.Screen name="Settings" component={SettingsScreen} />
-          <Stack.Screen name="AddAllergy" component={AddAllergyScreen} />
-          <Stack.Screen name="AddSymptoms" component={AddSymptomsScreen} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </ThemeProvider>
+    <LanguageProvider>
+      <ThemeProvider>
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName={session ? "Home" : "Login"}>
+            {/* <Stack.Navigator> */}
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Home" component={HomeScreen} />
+            <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen name="Settings" component={SettingsScreen} />
+            <Stack.Screen name="AddAllergy" component={AddAllergyScreen} />
+            <Stack.Screen name="AddSymptoms" component={AddSymptomsScreen} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </ThemeProvider>
+    </LanguageProvider>
   );
 }
 
