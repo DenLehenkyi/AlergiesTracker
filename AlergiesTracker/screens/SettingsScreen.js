@@ -1,13 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { View, StyleSheet, Text } from "react-native";
 import { List, Switch, Button } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 
-import { useContext } from "react";
 import lightTheme from "../themes/lightTheme";
 import darkTheme from "../themes/darkTheme";
 import ThemeContext from "../Context/ThemeContext";
-import { Session } from '@supabase/supabase-js'
+import { Session } from '@supabase/supabase-js';
 import { supabase } from "../lib/supabase";
 
 const SettingsScreen = () => {
@@ -16,17 +15,20 @@ const SettingsScreen = () => {
  
   const [isDarkTheme, setIsDarkTheme] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [language, setLanguage] = useState("ua"); 
   const navigation = useNavigation();
-  
 
   //const toggleTheme = () => setIsDarkTheme(!isDarkTheme);
 
   const toggleMute = () => setIsMuted(!isMuted);
 
-  const  handleLogout = async () => {
+  const handleLogout = async () => {
     await supabase.auth.signOut();
-    navigation.navigate("Login")
+    navigation.navigate("Login");
+  };
 
+  const toggleLanguage = () => {
+    setLanguage((prevLanguage) => (prevLanguage === "ua" ? "en" : "ua"));
   };
 
   return (
@@ -36,26 +38,24 @@ const SettingsScreen = () => {
       <View style={[styles.container, { backgroundColor: theme.lightGreen }]}>
         <List.Section>
           <List.Subheader style={{ color: theme.textColor }}>
-            Налаштування
+            {language === "ua" ? "Налаштування" : "Settings"}
           </List.Subheader>
           <List.Item
-            title="Змінити мову"
+            title={language === "ua" ? "Змінити мову" : "Change Language"}
             titleStyle={[styles.title, { color: theme.textColor }]}
             right={() => (
               <Button
                 labelStyle={[styles.buttonText, { color: theme.textColor }]}
                 style={[styles.button, { backgroundColor: theme.buttonColor }]}
                 mode="contained"
-                onPress={() => {
-                  /* Implement language change logic */
-                }}
+                onPress={toggleLanguage}
               >
-                Змінити
+                {language === "ua" ? "Змінити" : "Change"}
               </Button>
             )}
           />
           <List.Item
-            title="Чорна тема"
+            title={language === "ua" ? "Чорна тема" : "Dark Theme"}
             titleStyle={[styles.title, { color: theme.textColor }]}
             right={() => (
               <Switch
@@ -67,7 +67,7 @@ const SettingsScreen = () => {
             )}
           />
           <List.Item
-            title="Вимкнути звук"
+            title={language === "ua" ? "Вимкнути звук" : "Mute"}
             titleStyle={[styles.title, { color: theme.textColor }]}
             right={() => (
               <Switch
@@ -79,7 +79,7 @@ const SettingsScreen = () => {
             )}
           />
           <List.Item
-            title="Вийти"
+            title={language === "ua" ? "Вийти" : "Logout"}
             titleStyle={[styles.title, { color: theme.textColor }]}
             right={() => (
               <Button
@@ -88,7 +88,7 @@ const SettingsScreen = () => {
                 mode="contained"
                 onPress={handleLogout}
               >
-                Вийти
+                {language === "ua" ? "Вийти" : "Logout"}
               </Button>
             )}
           />
@@ -107,7 +107,6 @@ const styles = StyleSheet.create({
   },
   container: {
     alignItems: "center",
-
     padding: 20,
     height: 500,
     width: 370,
@@ -127,7 +126,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   title: {
-    fontWeight: 600,
+    fontWeight: "600",
     fontSize: 20,
   },
 });
