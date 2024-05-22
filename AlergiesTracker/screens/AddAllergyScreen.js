@@ -10,9 +10,11 @@ import darkTheme from "../themes/darkTheme";
 import ThemeContext from "../Context/ThemeContext";
 import ProductsGrid from "../components/ProductsGrid";
 import Categories from "../components/Categories";
+import LanguageContext from "../Context/LanguageContext";
 
 const AddAllergyScreen = () => {
   const { theme, toggleTheme } = useContext(ThemeContext);
+  const { language } = useContext(LanguageContext);
   const [showCategories, setShowCategories] = React.useState(false);
   const [chosenProducts, setChosenProducts] = React.useState([]);
   const categoriesScrollRef = useRef(null);
@@ -22,7 +24,7 @@ const AddAllergyScreen = () => {
       if (prevProducts.some((p) => p.name === product.name)) {
         return prevProducts.filter((p) => p.name !== product.name);
       }
-      return [product,...prevProducts];
+      return [product, ...prevProducts];
     });
 
     setShowCategories(true);
@@ -42,8 +44,13 @@ const AddAllergyScreen = () => {
         style={[styles.container, { backgroundColor: theme.backgroundColor }]}
         contentContainerStyle={styles.contentContainer}
       >
-        <Text style={[styles.text, { color: theme.textColor }]}>Додайте алерген</Text>
-        <ProductsGrid oncklick={toggleCategories} selectedProducts={chosenProducts} />
+        <Text style={[styles.text, { color: theme.textColor }]}>
+          {language === "en" ? "Add the allergen" : "Додайте алерген"}
+        </Text>
+        <ProductsGrid
+          oncklick={toggleCategories}
+          selectedProducts={chosenProducts}
+        />
       </ScrollView>
       {showCategories && (
         <Categories products={chosenProducts} ref={categoriesScrollRef} />
@@ -58,9 +65,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#F4FFF5",
   },
   contentContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: 40
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 40,
   },
   text: {
     fontSize: 22,

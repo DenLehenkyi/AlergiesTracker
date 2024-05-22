@@ -1,5 +1,13 @@
 import React, { useState, useEffect, useContext } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, ScrollView, Modal, Button } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  Modal,
+  Button,
+} from "react-native";
 import { supabase } from "../lib/supabase";
 import { AllergyContext } from "../Context/AllergyContext";
 import EggSvg from "../assets/svgs/egg";
@@ -17,6 +25,8 @@ import PlisniavaSvg from "../assets/svgs/plisniava";
 import InsectsSvg from "../assets/svgs/insects";
 import DrugsSvgs from "../assets/svgs/drugs";
 import { useNavigation } from "@react-navigation/native";
+import ThemeContext from "../Context/ThemeContext";
+import LanguageContext from "../Context/LanguageContext";
 
 const ProductsArray = [
   { name: "Яйця", svg: EggSvg, subcategories: ["Білок", "Жовток"] },
@@ -83,6 +93,8 @@ const symptomsArray = [
 ];
 
 const AddSymptomsScreen = () => {
+  const { theme } = useContext(ThemeContext);
+  const { language, translate } = useContext(LanguageContext);
   const [modalVisible, setModalVisible] = useState(false);
   const [session, setSession] = useState(null);
   const { selectedIds } = useContext(AllergyContext);
@@ -130,11 +142,9 @@ const AddSymptomsScreen = () => {
       }
       setAllergies(data);
     }
-  
+
     fetchAllergies();
   }, [selectedIds]);
-
-
 
   const handleSelectSymptom = (symptom) => {
     setSelectedSymptoms((prevSelectedSymptoms) => {
@@ -167,11 +177,9 @@ const AddSymptomsScreen = () => {
     allergies.some((allergy) => allergy.name === item.name)
   );
 
-
-
   const saveSymptomsToDB = async () => {
     const symptomsData = [];
-  
+
     Object.keys(selectedSymptoms).forEach((allergyName) => {
       const allergy = allergies.find((a) => a.name === allergyName);
       if (allergy) {
@@ -183,37 +191,38 @@ const AddSymptomsScreen = () => {
         });
       }
     });
-  
-    const { data, error } = await supabase
-      .from("symptom")
-      .insert(symptomsData);
-  
+
+    const { data, error } = await supabase.from("symptom").insert(symptomsData);
+
     if (error) {
       console.error("Error saving symptoms:", error);
       return;
     }
-  
+
     console.log("Symptoms saved successfully. Checking inserted data...");
-  
+
     // Перевірка вставлених даних
     const { data: insertedData, error: insertedError } = await supabase
       .from("symptom")
       .select("*")
-      .in("name", symptomsData.map((symptom) => symptom.name));
-  
+      .in(
+        "name",
+        symptomsData.map((symptom) => symptom.name)
+      );
+
     if (insertedError) {
       console.error("Error fetching inserted data:", insertedError);
       return;
     }
-  
+
     console.log("Inserted data:", insertedData);
   };
-  
-  
 
   return (
-    <ScrollView>
-      <Text style={styles.title}>Оберіть симптоми</Text>
+    <ScrollView style={{ backgroundColor: theme.backgroundColor }}>
+      <Text style={[styles.title, { color: theme.textColor }]}>
+        {translate("Оберіть симптоми")}
+      </Text>
       {selectedAllergies.map((allergy, index) => {
         const isDangerous = dangerousAllergens.includes(allergy.name);
         return (
@@ -221,11 +230,20 @@ const AddSymptomsScreen = () => {
             style={[
               styles.container,
               isDangerous && styles.dangerousContainer,
+
+              { backgroundColor: theme.backgroundColor },
             ]}
             key={index}
           >
-            <View style={styles.wrap}>
-              <View style={styles.flex}>
+            <View
+              style={[styles.wrap, { backgroundColor: theme.backgroundColor }]}
+            >
+              <View
+                style={[
+                  styles.flex,
+                  { backgroundColor: theme.backgroundColor },
+                ]}
+              >
                 <View
                   style={[
                     styles.product,
@@ -233,20 +251,33 @@ const AddSymptomsScreen = () => {
                   ]}
                 >
                   <allergy.svg />
-                  <Text style={styles.name}>{allergy.name}</Text>
+                  <Text style={styles.name}>{translate(allergy.name)}</Text>
                 </View>
-                <View style={styles.options}>
+                <View
+                  style={[
+                    styles.options,
+                    { color: theme.textColor },
+                    { backgroundColor: theme.backgroundColor },
+                  ]}
+                >
                   <Button
-                    title="Вибрати симптоми"
+                    title={
+                      language === "en" ? "Select symptoms" : "Вибрати симптоми"
+                    }
                     onPress={() => {
                       setCurrentAllergy(allergy.name);
                       setModalVisible(true);
                     }}
                   />
                   <Text
-                    style={{ fontSize: 16, fontWeight: "600", marginLeft: 10 }}
+                    style={[
+                      { fontSize: 16, fontWeight: "600", marginLeft: 10 },
+                      { color: theme.textColor },
+                    ]}
                   >
-                    Вибрані симптоми:
+                    {language === "en"
+                      ? "Selected symptoms"
+                      : "Вибрані симптоми"}
                   </Text>
                   {(selectedSymptoms[allergy.name] || []).map((symptom) => (
                     <Text
@@ -256,13 +287,17 @@ const AddSymptomsScreen = () => {
                       ]}
                       key={symptom.id}
                     >
-                      {symptom.name}
+                      {translate(symptom.name)}
                     </Text>
                   ))}
                 </View>
               </View>
               <Button
-                title="Позначити як особливо небезпечний алерген"
+                title={
+                  language === "en"
+                    ? "Mark as a particularly dangerous allergen"
+                    : "Позначити як особливо небезпечний алерген"
+                }
                 onPress={() => {
                   setCurrentAllergy(allergy.name);
                   markAsDangerous();
@@ -278,11 +313,25 @@ const AddSymptomsScreen = () => {
                 setModalVisible(false);
               }}
             >
-              <View style={styles.modalView}>
-                <View style={styles.modalHeader}>
-                  <Text style={styles.modalText}>Оберіть симптоми</Text>
+              <View
+                style={[
+                  styles.modalView,
+                  { backgroundColor: theme.backgroundColor },
+                ]}
+              >
+                <View style={[styles.modalHeader, { color: theme.textColor }]}>
+                  <Text style={[styles.modalText, { color: theme.textColor }]}>
+                    {language === "en" ? "Choose symptoms" : "Оберіть симптоми"}
+                  </Text>
                   <TouchableOpacity onPress={() => setModalVisible(false)}>
-                    <Text style={styles.closeButtonText}>Закрити</Text>
+                    <Text
+                      style={[
+                        styles.closeButtonText,
+                        { color: theme.textColor },
+                      ]}
+                    >
+                      {language === "en" ? "Close" : "Закрити"}
+                    </Text>
                   </TouchableOpacity>
                 </View>
                 <ScrollView style={styles.modalScroll}>
@@ -299,7 +348,9 @@ const AddSymptomsScreen = () => {
                       ]}
                       onPress={() => handleSelectSymptom(symptom)}
                     >
-                      <Text style={styles.symptomText}>{symptom.name}</Text>
+                      <Text style={styles.symptomText}>
+                        {translate(symptom.name)}
+                      </Text>
                     </TouchableOpacity>
                   ))}
                 </ScrollView>
@@ -308,11 +359,14 @@ const AddSymptomsScreen = () => {
           </View>
         );
       })}
-
-      <Button onPress={()=> {
-        saveSymptomsToDB()
-        navigation.navigate("Home")
-      }} title="Завершити"></Button>
+      <Button
+        onPress={() => {
+          saveSymptomsToDB();
+          navigation.navigate("Home");
+        }}
+        title={language === "en" ? "End" : "Завершити"}
+        
+      />
     </ScrollView>
   );
 };

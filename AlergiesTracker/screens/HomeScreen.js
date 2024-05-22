@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { View, Text, StyleSheet, FlatList, ScrollView } from "react-native";
+import { View, Text, StyleSheet, FlatList } from "react-native";
 import { TouchableRipple } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import { supabase } from "../lib/supabase";
@@ -8,8 +8,8 @@ import ThemeContext from "../Context/ThemeContext";
 import LanguageContext from "../Context/LanguageContext";
 
 export default function HomeScreen() {
-  const { theme } = useContext(ThemeContext);
-  const { language } = useContext(LanguageContext);
+  const { theme, toggleTheme } = useContext(ThemeContext);
+  const { language, translate } = useContext(LanguageContext);
   const [allergies, setAllergies] = useState([]);
   const [symptoms, setSymptoms] = useState({});
   const [subcategories, setSubcategories] = useState({});
@@ -80,6 +80,7 @@ export default function HomeScreen() {
           if (error) {
             throw error;
           }
+
           symptomsData[allergy.id] = data.map((symptom) => symptom.name);
         } catch (error) {
           console.error("Error fetching symptoms:", error);
@@ -124,25 +125,23 @@ export default function HomeScreen() {
   }, [allergies]);
 
   const renderAllergyItem = ({ item }) => (
-    <View style={styles.allergyItem}>
-      <Text style={[styles.allergyName, { color: theme.textColor }]}>
-        {language === "ua" ? "Алергія:" : "Allergy:"} {item.name}
+    <View style={[styles.allergyItem]}>
+      <Text style={[styles.allergyName, { color: theme.blackColor }]}>
+        {language === "en" ? translate(item.name) : item.name}
       </Text>
-      <Text style={[styles.subcategories, { color: theme.textColor }]}>
-        {language === "ua" ? "Підкатегорії:" : "Subcategories:"}{" "}
+      <Text style={[styles.allergyName, { color: theme.blackColor }]}>
+        {translate("subcategories")}:{" "}
         {subcategories[item.id] && subcategories[item.id].length > 0
-          ? subcategories[item.id].join(", ")
-          : language === "ua"
-          ? "Немає підкатегорій"
-          : "No subcategories"}
+          ? subcategories[item.id]
+              .map((subcategory) => translate(subcategory))
+              .join(", ")
+          : translate("noSubcategories")}
       </Text>
-      <Text style={[styles.subcategories, { color: theme.textColor }]}>
-        {language === "ua" ? "Симптоми:" : "Symptoms:"}{" "}
+      <Text style={[styles.subcategories, { color: theme.blackColor }]}>
+        {translate("symptoms")}:{" "}
         {symptoms[item.id] && symptoms[item.id].length > 0
-          ? symptoms[item.id].join(", ")
-          : language === "ua"
-          ? "Немає симптомів"
-          : "No symptoms"}
+          ? symptoms[item.id].map((symptom) => translate(symptom)).join(", ")
+          : translate("noSymptoms")}
       </Text>
     </View>
   );
@@ -150,35 +149,38 @@ export default function HomeScreen() {
   return (
     <>
       <MyDrawer />
-      <ScrollView>
+      <View
+        style={[
+          styles.container,
+          { backgroundColor: theme.backgroundColor },
+          { fontFamily: theme.font },
+        ]}
+      >
         <View
           style={[
-            styles.container,
+            styles.allergiesContainer,
             { backgroundColor: theme.backgroundColor },
-            { fontFamily: theme.font },
           ]}
         >
-          <View style={styles.allergiesContainer}>
-            <Text style={[styles.sectionTitle, { color: theme.textColor }]}>
-              {language === "ua" ? "Ваші алергії" : "Your Allergies"}
-            </Text>
-            <FlatList
-              data={allergies}
-              renderItem={renderAllergyItem}
-              keyExtractor={(item) => item.id.toString()}
-            />
-          </View>
-
-          <TouchableRipple
-            style={[styles.button, { backgroundColor: theme.buttonColor }]}
-            onPress={() => navigation.navigate("AddAllergy")}
-          >
-            <Text style={[styles.buttonText, { color: theme.textColor }]}>
-              {language === "ua" ? "Додати алергію" : "Add allergy"}
-            </Text>
-          </TouchableRipple>
+          <Text style={[styles.sectionTitle, { color: theme.textColor }]}>
+            {translate("MyAllergies")}
+          </Text>
+          <FlatList
+            data={allergies}
+            renderItem={renderAllergyItem}
+            keyExtractor={(item) => item.id.toString()}
+          />
         </View>
-      </ScrollView>
+
+        <TouchableRipple
+          style={[styles.button, { backgroundColor: theme.buttonColor }]}
+          onPress={() => navigation.navigate("AddAllergy")}
+        >
+          <Text style={[styles.buttonText, { color: theme.textColor }]}>
+            {translate("addAllergy")}
+          </Text>
+        </TouchableRipple>
+      </View>
     </>
   );
 }
@@ -205,7 +207,8 @@ const styles = StyleSheet.create({
   },
   allergiesContainer: {
     marginTop: 20,
-    width: "100%",
+
+    borderColor: "#white",
   },
   sectionTitle: {
     fontSize: 16,
@@ -214,7 +217,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   allergyItem: {
-    backgroundColor: "#E2FFE6",
+    backgroundColor: "#e2ffe6",
     padding: 15,
     marginVertical: 8,
     borderRadius: 10,

@@ -13,12 +13,17 @@ import { Session } from "@supabase/supabase-js";
 import { useContext } from "react";
 import AllergyProvider from "../Context/AllergyContext";
 import { AllergyContext } from "../Context/AllergyContext";
+import { Language } from "@mui/icons-material";
+import LanguageContext from "../Context/LanguageContext";
+import ThemeContext from "../Context/ThemeContext";
 
 const Categories = ({ products }) => {
+  const { language, translate } = useContext(LanguageContext);
+  const { theme } = useContext(ThemeContext);
   const navigation = useNavigation();
   const [selectedCategories, setSelectedCategories] = useState({});
   const [session, setSession] = useState(null);
-  const {addId} = useContext(AllergyContext);
+  const { addId } = useContext(AllergyContext);
 
   useEffect(() => {
     async function fetchSession() {
@@ -118,22 +123,31 @@ const Categories = ({ products }) => {
 
   return (
     <ScrollView
-      style={styles.scrollView}
+      style={[styles.scrollView, {backgroundColor: theme.backgroundColor}]}
       contentContainerStyle={styles.scrollViewContent}
     >
-      <View style={styles.container}>
-        <Text style={styles.t}>Оберіть категорії</Text>
+      <View style={[styles.container,  {backgroundColor: theme.backgroundColor}]}>
+        <Text style={styles.t}>
+          {language === "en" ? "Choose categories" : "Оберіть категорії"}
+        </Text>
         {products &&
           products.map((item, itemIndex) => (
             <View key={itemIndex} style={styles.productContainer}>
               <View style={styles.product}>
                 <item.svg />
-                <Text style={styles.name}>{item.name}</Text>
+                <Text style={styles.name}>
+                  {" "}
+                  {language === "en" ? translate(item.name) : item.name}
+                </Text>
               </View>
               {item.subcategories && item.subcategories.length > 0 && (
                 <View style={styles.choose}>
                   <View style={styles.categoriesContainer}>
-                    <Text style={styles.title}>Виберіть категорію</Text>
+                    <Text style={styles.title}>
+                      {language === "en"
+                        ? "Choose category"
+                        : "Виберіть категорію"}
+                    </Text>
                     {item.subcategories.map((category, categoryIndex) => (
                       <View key={categoryIndex} style={styles.categoryItem}>
                         <TouchableOpacity
@@ -154,7 +168,9 @@ const Categories = ({ products }) => {
                                 : null,
                             ]}
                           >
-                            {category}
+                            {language === "en"
+                              ? translate(category)
+                              : item.name}
                           </Text>
                         </TouchableOpacity>
                         {selectedCategories[itemIndex] &&
@@ -165,7 +181,7 @@ const Categories = ({ products }) => {
                               }
                             >
                               <Text style={styles.removeCategory}>
-                                Видалити
+                                {language === "en" ? "Remove" : "Видалити"}
                               </Text>
                             </TouchableOpacity>
                           )}
@@ -178,14 +194,14 @@ const Categories = ({ products }) => {
           ))}
       </View>
       <Button
-        style={styles.button}
-        labelStyle={styles.buttonLabel}
+        style={[styles.button, {backgroundColor:theme.buttonColor}]}
+        labelStyle={[styles.buttonLabel, {color: theme.textColor}]}
         onPress={() => {
           navigation.navigate("AddSymptoms");
           saveSelectedProducts(products);
         }}
       >
-        Перейти до симптомів
+        {language === "en" ? "Go to symptoms" : "Перейти до симптомів"}
       </Button>
     </ScrollView>
   );

@@ -101,7 +101,7 @@ const ProductsGrid = ({ oncklick, selectedProducts }) => {
   //     console.log("Data inserted successfully:", data);
   //   }
   // };
-
+  const {language, translate} = useContext(LanguageContext);
   return (
     <View style={styles.allProducts}>
       {ProductsArray.map((item, index) => (
@@ -117,7 +117,7 @@ const ProductsGrid = ({ oncklick, selectedProducts }) => {
           }}
           key={index}
         >
-          <Text style={styles.name}>{item.name}</Text>
+          <Text style={styles.name}>{language === "en" ? translate(item.name) : item.name}</Text>
           <item.svg />
         </TouchableOpacity>
       ))}

@@ -2,91 +2,116 @@ import React, { createContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LanguageContext = createContext();
+
 const translations = {
   ua: {
-    eggs: "Яйця",
-    nuts: "Горіхи",
-    grains: "Зернові",
-    seafood: "Море-продукти",
-    chocolate: "Шоколад",
-    vegetables: "Овочі",
-    fruits: "Фрукти",
-    honey: "Мед",
-    pollen: "Пилок",
-    animalWool: "Шерсть тварин",
-    mites: "Кліщі",
-    mold: "Пліснява",
-    insects: "Комахи",
-    penicillin: "Пеніцилін",
-    eggWhite: "Білок",
-    yolk: "Жовток",
-    almond: "Мигдаль",
-    hazelnut: "Фундук",
-    walnut: "Грецький горіх",
-    peanut: "Арахіс",
-    wheat: "Пшениця",
-    rye: "Жито",
-    barley: "Ячмінь",
-    fish: "Риба",
-    shrimp: "Креветки",
-    mussels: "Мідії",
-    darkChocolate: "Темний шоколад",
-    milkChocolate: "Молочний шоколад",
-    carrot: "Морква",
-    potato: "Картопля",
-    beet: "Буряк",
-    apples: "Яблука",
-    bananas: "Банани",
-    citrus: "Цитрусові",
-    cats: "Коти",
-    dogs: "Собаки",
-    bees: "Бджоли",
-    wasps: "Оси",
+    "Яйця": "Яйця",
+    "Горіхи": "Горіхи",
+    "Зернові": "Зернові",
+    "Море-продукти": "Море-продукти",
+    "Шоколад": "Шоколад",
+    "Овочі": "Овочі",
+    "Фрукти": "Фрукти",
+    "Мед": "Мед",
+    "Пилок": "Пилок",
+    "Шерсть тварин": "Шерсть тварин",
+    "Кліщі": "Кліщі",
+    "Пліснява": "Пліснява",
+    "Комахи": "Комахи",
+    "Пеніцилін": "Пеніцилін",
+    "Білок": "Білок",
+    "Жовток": "Жовток",
+    "Мигдаль": "Мигдаль",
+    "Фундук": "Фундук",
+    "Грецький горіх": "Грецький горіх",
+    "Арахіс": "Арахіс",
+    "Пшениця": "Пшениця",
+    "Жито": "Жито",
+    "Ячмінь": "Ячмінь",
+    "Риба": "Риба",
+    "Креветки": "Креветки",
+    "Мідії": "Мідії",
+    "Темний шоколад": "Темний шоколад",
+    "Молочний шоколад": "Молочний шоколад",
+    "Морква": "Морква",
+    "Картопля": "Картопля",
+    "Буряк": "Буряк",
+    "Яблука": "Яблука",
+    "Банани": "Банани",
+    "Цитрусові": "Цитрусові",
+    "Коти": "Коти",
+    "Собаки": "Собаки",
+    "Бджоли": "Бджоли",
+    "Оси": "Оси",
+    "Нежить" : "Нежить",
+    "Сльозотеча": "Сльозотеча",
+    "Кашель": "Кашель",
+    "Кропив'янка": "Кропив'янка",
+    "Свербіж в горлі": "Свербіж в горлі",
+    "Закладеність носа": "Закладеність носа",
+    "Висип": "Висип",
+    "Свербіж шкіри": "Свербіж шкіри",
+    "Хрипи": "Хрипи",
+    "Задишка": "Задишка",
+    "Свербіж очей": "Свербіж очей",
+    "Чхання": "Чхання"
   },
   en: {
-    eggs: "Eggs",
-    nuts: "Nuts",
-    grains: "Grains",
-    seafood: "Seafood",
-    chocolate: "Chocolate",
-    vegetables: "Vegetables",
-    fruits: "Fruits",
-    honey: "Honey",
-    pollen: "Pollen",
-    animalWool: "Animal Wool",
-    mites: "Mites",
-    mold: "Mold",
-    insects: "Insects",
-    penicillin: "Penicillin",
-    eggWhite: "Egg White",
-    yolk: "Yolk",
-    almond: "Almond",
-    hazelnut: "Hazelnut",
-    walnut: "Walnut",
-    peanut: "Peanut",
-    wheat: "Wheat",
-    rye: "Rye",
-    barley: "Barley",
-    fish: "Fish",
-    shrimp: "Shrimp",
-    mussels: "Mussels",
-    darkChocolate: "Dark Chocolate",
-    milkChocolate: "Milk Chocolate",
-    carrot: "Carrot",
-    potato: "Potato",
-    beet: "Beet",
-    apples: "Apples",
-    bananas: "Bananas",
-    citrus: "Citrus",
-    cats: "Cats",
-    dogs: "Dogs",
-    bees: "Bees",
-    wasps: "Wasps",
+    "Яйця": "Eggs",
+    "Горіхи": "Nuts",
+    "Зернові": "Grains",
+    "Море-продукти": "Seafood",
+    "Шоколад": "Chocolate",
+    "Овочі": "Vegetables",
+    "Фрукти": "Fruits",
+    "Мед": "Honey",
+    "Пилок": "Pollen",
+    "Шерсть тварин": "Animal Wool",
+    "Кліщі": "Mites",
+    "Пліснява": "Mold",
+    "Комахи": "Insects",
+    "Пеніцилін": "Penicillin",
+    "Білок": "Egg White",
+    "Жовток": "Yolk",
+    "Мигдаль": "Almond",
+    "Фундук": "Hazelnut",
+    "Грецький горіх": "Walnut",
+    "Арахіс": "Peanut",
+    "Пшениця": "Wheat",
+    "Жито": "Rye",
+    "Ячмінь": "Barley",
+    "Риба": "Fish",
+    "Креветки": "Shrimp",
+    "Мідії": "Mussels",
+    "Темний шоколад": "Dark Chocolate",
+    "Молочний шоколад": "Milk Chocolate",
+    "Морква": "Carrot",
+    "Картопля": "Potato",
+    "Буряк": "Beet",
+    "Яблука": "Apples",
+    "Банани": "Bananas",
+    "Цитрусові": "Citrus",
+    "Коти": "Cats",
+    "Собаки": "Dogs",
+    "Бджоли": "Bees",
+    "Оси": "Wasps",
+    "Нежить" : "Cold",
+    "Сльозотеча": "Tearing",
+    "Кашель": "Cough",
+    "Кропив'янка": "Urticaria",
+    "Свербіж в горлі": "Sore Throat",
+    "Закладеність носа": "Nasal Congestion",
+    "Висип": "Rash",
+    "Свербіж шкіри": "Skin Itching",
+    "Хрипи": "Wheezing",
+    "Задишка": "Shortness of Breath",
+    "Свербіж очей": "Eye Itching",
+    "Чхання": "Sneezing"
   },
 };
 export const LanguageProvider = ({ children }) => {
   const [language, setLanguage] = useState("ua");
-  const [isLoaded, setIsLoaded] = useState(false); // новий стан для відстеження завантаження
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     const loadLanguage = async () => {
@@ -98,7 +123,7 @@ export const LanguageProvider = ({ children }) => {
       } catch (error) {
         console.error("Failed to load language from AsyncStorage:", error);
       } finally {
-        setIsLoaded(true); // встановлюємо стан після завершення завантаження
+        setIsLoaded(true);
       }
     };
     loadLanguage();
@@ -115,11 +140,13 @@ export const LanguageProvider = ({ children }) => {
   };
 
   if (!isLoaded) {
-    return null; // або показати спіннер/завантажувальний екран
+    return null;
   }
+
   const translate = (key) => {
-    return translations[language][key];
+    return translations[language][key] || key;
   };
+
   return (
     <LanguageContext.Provider value={{ language, toggleLanguage, translate }}>
       {children}
