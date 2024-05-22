@@ -60,47 +60,47 @@ const ProductsArray = [
 ];
 
 const ProductsGrid = ({ oncklick, selectedProducts }) => {
-  const [session, setSession] = useState(null);
+  // const [session, setSession] = useState(null);
 
-  useEffect(() => {
-    async function fetchSession() {
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.getSession();
-      if (error) {
-        console.error("Error fetching session:", error);
-        return;
-      }
-      setSession(session);
-    }
+  // useEffect(() => {
+  //   async function fetchSession() {
+  //     const {
+  //       data: { session },
+  //       error,
+  //     } = await supabase.auth.getSession();
+  //     if (error) {
+  //       console.error("Error fetching session:", error);
+  //       return;
+  //     }
+  //     setSession(session);
+  //   }
 
-    fetchSession();
+  //   fetchSession();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session);
-      }
-    );
+  //   const { data: authListener } = supabase.auth.onAuthStateChange(
+  //     (_event, session) => {
+  //       setSession(session);
+  //     }
+  //   );
 
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
-  }, []);
+  //   return () => {
+  //     authListener.subscription.unsubscribe();
+  //   };
+  // }, []);
 
-  const saveSelectedProducts = async (selectedProduct) => {
-    const userId = session.user.id;
+  // const saveSelectedProducts = async (selectedProduct) => {
+  //   const userId = session.user.id;
 
-    const { data, error } = await supabase
-      .from("allergy")
-      .insert([{ user_id: userId, name: selectedProduct.name }]);
+  //   const { data, error } = await supabase
+  //     .from("allergy")
+  //     .insert([{ user_id: userId, name: selectedProduct.name }]);
 
-    if (error) {
-      console.error("Error inserting data:", error);
-    } else {
-      console.log("Data inserted successfully:", data);
-    }
-  };
+  //   if (error) {
+  //     console.error("Error inserting data:", error);
+  //   } else {
+  //     console.log("Data inserted successfully:", data);
+  //   }
+  // };
 
   return (
     <View style={styles.allProducts}>
@@ -113,7 +113,7 @@ const ProductsGrid = ({ oncklick, selectedProducts }) => {
           ]}
           onPress={() => {
             oncklick(item);
-            saveSelectedProducts([item]); // Збереження вибраного продукту
+            // saveSelectedProducts(item); // Збереження вибраного продукту
           }}
           key={index}
         >

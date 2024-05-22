@@ -12,6 +12,7 @@ import AddSymptomsScreen from "./screens/AddSymptomsScreen";
 import { supabase } from "./lib/supabase";
 import { Session } from "@supabase/supabase-js";
 import { LanguageProvider } from "./Context/LanguageContext";
+import { AllergyProvider } from "./Context/AllergyContext";
 const Stack = createStackNavigator();
 
 function App() {
@@ -48,6 +49,7 @@ function App() {
   return (
     <LanguageProvider>
       <ThemeProvider>
+      <AllergyProvider>
         <NavigationContainer>
           <Stack.Navigator initialRouteName={session ? "Home" : "Login"}>
             {/* <Stack.Navigator> */}
@@ -59,6 +61,7 @@ function App() {
             <Stack.Screen name="AddSymptoms" component={AddSymptomsScreen} />
           </Stack.Navigator>
         </NavigationContainer>
+        </AllergyProvider>
       </ThemeProvider>
     </LanguageProvider>
   );

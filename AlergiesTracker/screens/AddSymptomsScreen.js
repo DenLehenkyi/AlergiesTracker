@@ -1,6 +1,63 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, Modal, Button } from "react-native";
+import { supabase } from "../lib/supabase";
+import { AllergyContext } from "../Context/AllergyContext";
+import EggSvg from "../assets/svgs/egg";
+import NutsSvg from "../assets/svgs/nuts";
 import ZernoSvg from "../assets/svgs/zerno";
+import FishSvg from "../assets/svgs/fish";
+import ChocolateSvg from "../assets/svgs/chocolate";
+import VegetablesSvg from "../assets/svgs/vegetables";
+import FruitsSvg from "../assets/svgs/fruits";
+import HoneySvg from "../assets/svgs/honey";
+import PylokSvg from "../assets/svgs/pylok";
+import AnimalsSvg from "../assets/svgs/animals";
+import KlishchiSvg from "../assets/svgs/klishchi";
+import PlisniavaSvg from "../assets/svgs/plisniava";
+import InsectsSvg from "../assets/svgs/insects";
+import DrugsSvgs from "../assets/svgs/drugs";
+import { useNavigation } from "@react-navigation/native";
+
+const ProductsArray = [
+  { name: "Яйця", svg: EggSvg, subcategories: ["Білок", "Жовток"] },
+  {
+    name: "Горіхи",
+    svg: NutsSvg,
+    subcategories: ["Мигдаль", "Фундук", "Грецький горіх", "Арахіс"],
+  },
+  {
+    name: "Зернові",
+    svg: ZernoSvg,
+    subcategories: ["Пшениця", "Жито", "Ячмінь"],
+  },
+  {
+    name: "Море-продукти",
+    svg: FishSvg,
+    subcategories: ["Риба", "Креветки", "Мідії"],
+  },
+  {
+    name: "Шоколад",
+    svg: ChocolateSvg,
+    subcategories: ["Темний шоколад", "Молочний шоколад"],
+  },
+  {
+    name: "Овочі",
+    svg: VegetablesSvg,
+    subcategories: ["Морква", "Картопля", "Буряк"],
+  },
+  {
+    name: "Фрукти",
+    svg: FruitsSvg,
+    subcategories: ["Яблука", "Банани", "Цитрусові"],
+  },
+  { name: "Мед", svg: HoneySvg, subcategories: [] },
+  { name: "Пилок", svg: PylokSvg, subcategories: [] },
+  { name: "Шерсть тварин", svg: AnimalsSvg, subcategories: ["Коти", "Собаки"] },
+  { name: "Кліщі", svg: KlishchiSvg, subcategories: [] },
+  { name: "Пліснява", svg: PlisniavaSvg, subcategories: [] },
+  { name: "Комахи", svg: InsectsSvg, subcategories: ["Бджоли", "Оси"] },
+  { name: "Пеніцилін", svg: DrugsSvgs, subcategories: [] },
+];
 
 const symptomsArray = [
   { id: 1, name: "Нежить" },
@@ -26,92 +83,245 @@ const symptomsArray = [
 ];
 
 const AddSymptomsScreen = () => {
-  const [selectedSymptoms, setSelectedSymptoms] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [productDangerous, setProductDangerous] = useState(false);
+  const [session, setSession] = useState(null);
+  const { selectedIds } = useContext(AllergyContext);
+  const [allergies, setAllergies] = useState([]);
+  const [selectedSymptoms, setSelectedSymptoms] = useState({});
+  const [currentAllergy, setCurrentAllergy] = useState(null);
+  const [dangerousAllergens, setDangerousAllergens] = useState([]);
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    async function fetchSession() {
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+      if (error) {
+        console.error("Error fetching session:", error);
+        return;
+      }
+      setSession(session);
+    }
+
+    fetchSession();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session);
+      }
+    );
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    async function fetchAllergies() {
+      const { data, error } = await supabase
+        .from("allergy")
+        .select("*") // Вибрати всі поля алергії
+        .in("id", selectedIds);
+      if (error) {
+        console.error("Error fetching allergies:", error);
+        return;
+      }
+      setAllergies(data);
+    }
+  
+    fetchAllergies();
+  }, [selectedIds]);
+
+
 
   const handleSelectSymptom = (symptom) => {
     setSelectedSymptoms((prevSelectedSymptoms) => {
-      if (prevSelectedSymptoms.some((s) => s.id === symptom.id)) {
-        return prevSelectedSymptoms.filter((s) => s.id !== symptom.id);
+      const allergySymptoms = prevSelectedSymptoms[currentAllergy] || [];
+      if (allergySymptoms.some((s) => s.id === symptom.id)) {
+        return {
+          ...prevSelectedSymptoms,
+          [currentAllergy]: allergySymptoms.filter((s) => s.id !== symptom.id),
+        };
       } else {
-        return [...prevSelectedSymptoms, symptom];
+        return {
+          ...prevSelectedSymptoms,
+          [currentAllergy]: [...allergySymptoms, symptom],
+        };
       }
     });
   };
 
   const markAsDangerous = () => {
-    setProductDangerous((prevState) => !prevState);
+    setDangerousAllergens((prevState) => {
+      if (prevState.includes(currentAllergy)) {
+        return prevState.filter((allergy) => allergy !== currentAllergy);
+      } else {
+        return [...prevState, currentAllergy];
+      }
+    });
   };
 
-  return (
-    <View style={[styles.container, productDangerous && styles.dangerousContainer]}>
-      <Text style={styles.title}>Оберіть симптом</Text>
-      <ScrollView contentContainerStyle={styles.wrap}>
-        <View style={styles.flex}>
-          <View style={[styles.product, productDangerous && styles.dangerousProduct]}>
-            <ZernoSvg />
-          </View>
-          <View style={styles.options}>
-            <Button title="Вибрати симптоми" onPress={() => setModalVisible(true)} />
-            <Text style={{ fontSize: 16, fontWeight: "600", marginLeft: 10 }}>Вибрані симптоми:</Text>
-            {selectedSymptoms.map((symptom) => (
-              <Text
-                style={[
-                  styles.symp,
-                  productDangerous && styles.dangerousSymptom,
-                ]}
-                key={symptom.id}
-              >
-                {symptom.name}
-              </Text>
-            ))}
-          </View>
-        </View>
-        <Button title="Позначити як особливо небезпечний алерген" onPress={markAsDangerous} />
-      </ScrollView>
+  const selectedAllergies = ProductsArray.filter((item) =>
+    allergies.some((allergy) => allergy.name === item.name)
+  );
 
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(!modalVisible);
-        }}
-      >
-        <View style={styles.modalView}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalText}>Оберіть симптоми</Text>
-            <TouchableOpacity onPress={() => setModalVisible(false)}>
-              <Text style={styles.closeButtonText}>Закрити</Text>
-            </TouchableOpacity>
+
+
+  const saveSymptomsToDB = async () => {
+    const symptomsData = [];
+  
+    Object.keys(selectedSymptoms).forEach((allergyName) => {
+      const allergy = allergies.find((a) => a.name === allergyName);
+      if (allergy) {
+        selectedSymptoms[allergyName].forEach((symptom) => {
+          symptomsData.push({
+            allergy_id: allergy.id, // Використовуємо id алергену
+            name: symptom.name,
+          });
+        });
+      }
+    });
+  
+    const { data, error } = await supabase
+      .from("symptom")
+      .insert(symptomsData);
+  
+    if (error) {
+      console.error("Error saving symptoms:", error);
+      return;
+    }
+  
+    console.log("Symptoms saved successfully. Checking inserted data...");
+  
+    // Перевірка вставлених даних
+    const { data: insertedData, error: insertedError } = await supabase
+      .from("symptom")
+      .select("*")
+      .in("name", symptomsData.map((symptom) => symptom.name));
+  
+    if (insertedError) {
+      console.error("Error fetching inserted data:", insertedError);
+      return;
+    }
+  
+    console.log("Inserted data:", insertedData);
+  };
+  
+  
+
+  return (
+    <ScrollView>
+      <Text style={styles.title}>Оберіть симптоми</Text>
+      {selectedAllergies.map((allergy, index) => {
+        const isDangerous = dangerousAllergens.includes(allergy.name);
+        return (
+          <View
+            style={[
+              styles.container,
+              isDangerous && styles.dangerousContainer,
+            ]}
+            key={index}
+          >
+            <View style={styles.wrap}>
+              <View style={styles.flex}>
+                <View
+                  style={[
+                    styles.product,
+                    isDangerous && styles.dangerousProduct,
+                  ]}
+                >
+                  <allergy.svg />
+                  <Text style={styles.name}>{allergy.name}</Text>
+                </View>
+                <View style={styles.options}>
+                  <Button
+                    title="Вибрати симптоми"
+                    onPress={() => {
+                      setCurrentAllergy(allergy.name);
+                      setModalVisible(true);
+                    }}
+                  />
+                  <Text
+                    style={{ fontSize: 16, fontWeight: "600", marginLeft: 10 }}
+                  >
+                    Вибрані симптоми:
+                  </Text>
+                  {(selectedSymptoms[allergy.name] || []).map((symptom) => (
+                    <Text
+                      style={[
+                        styles.symp,
+                        isDangerous && styles.dangerousSymptom,
+                      ]}
+                      key={symptom.id}
+                    >
+                      {symptom.name}
+                    </Text>
+                  ))}
+                </View>
+              </View>
+              <Button
+                title="Позначити як особливо небезпечний алерген"
+                onPress={() => {
+                  setCurrentAllergy(allergy.name);
+                  markAsDangerous();
+                }}
+              />
+            </View>
+
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={modalVisible && currentAllergy === allergy.name}
+              onRequestClose={() => {
+                setModalVisible(false);
+              }}
+            >
+              <View style={styles.modalView}>
+                <View style={styles.modalHeader}>
+                  <Text style={styles.modalText}>Оберіть симптоми</Text>
+                  <TouchableOpacity onPress={() => setModalVisible(false)}>
+                    <Text style={styles.closeButtonText}>Закрити</Text>
+                  </TouchableOpacity>
+                </View>
+                <ScrollView style={styles.modalScroll}>
+                  {symptomsArray.map((symptom) => (
+                    <TouchableOpacity
+                      key={symptom.id}
+                      style={[
+                        styles.symptomButton,
+                        (selectedSymptoms[currentAllergy] || []).some(
+                          (s) => s.id === symptom.id
+                        )
+                          ? styles.selectedSymptom
+                          : null,
+                      ]}
+                      onPress={() => handleSelectSymptom(symptom)}
+                    >
+                      <Text style={styles.symptomText}>{symptom.name}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            </Modal>
           </View>
-          <ScrollView style={styles.modalScroll}>
-            {symptomsArray.map((symptom) => (
-              <TouchableOpacity
-                key={symptom.id}
-                style={[
-                  styles.symptomButton,
-                  selectedSymptoms.some((s) => s.id === symptom.id)
-                    ? styles.selectedSymptom
-                    : null,
-                ]}
-                onPress={() => handleSelectSymptom(symptom)}
-              >
-                <Text style={styles.symptomText}>{symptom.name}</Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
-      </Modal>
-    </View>
+        );
+      })}
+
+      <Button onPress={()=> {
+        saveSymptomsToDB()
+        navigation.navigate("Home")
+      }} title="Завершити"></Button>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: "#F4FFF5",
+    marginBottom: 20,
+    padding: 10,
   },
   dangerousContainer: {
     backgroundColor: "#FFCCCC",
@@ -184,7 +394,6 @@ const styles = StyleSheet.create({
     padding: 10,
     borderColor: "green",
     borderWidth: 2,
-    margin: 20,
     borderRadius: 15,
   },
   modalView: {

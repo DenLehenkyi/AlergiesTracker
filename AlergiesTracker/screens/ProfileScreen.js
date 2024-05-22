@@ -4,11 +4,11 @@ import { MaterialIcons } from "@expo/vector-icons";
 import MyDrawer from "./MyDrawer";
 import ThemeContext from "../Context/ThemeContext";
 import { supabase } from "../lib/supabase"; // Adjust the path according to your project structure
-
+import { Session } from "@supabase/supabase-js";
 export default function ProfileScreen() {
   const { theme } = useContext(ThemeContext);
   const [userData, setUserData] = useState(null);
-  const [session, setSession] = useState(null);
+  const [session, setSession] = useState(Session);
 
   useEffect(() => {
     async function fetchSession() {

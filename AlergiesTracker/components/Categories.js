@@ -1,11 +1,96 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 import { Button } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
+import { supabase } from "../lib/supabase";
+import { Session } from "@supabase/supabase-js";
+import { useContext } from "react";
+import AllergyProvider from "../Context/AllergyContext";
+import { AllergyContext } from "../Context/AllergyContext";
 
 const Categories = ({ products }) => {
-    const navigation = useNavigation();
+  const navigation = useNavigation();
   const [selectedCategories, setSelectedCategories] = useState({});
+  const [session, setSession] = useState(null);
+  const {addId} = useContext(AllergyContext);
+
+  useEffect(() => {
+    async function fetchSession() {
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+      if (error) {
+        console.error("Error fetching session:", error);
+        return;
+      }
+      setSession(session);
+    }
+
+    fetchSession();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session);
+      }
+    );
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
+
+  const saveSelectedProducts = async (selectedProducts) => {
+    const userId = session.user.id;
+
+    for (let product of selectedProducts) {
+      const selectedSubcategories =
+        selectedCategories[selectedProducts.indexOf(product)] || [];
+      console.log(selectedCategories);
+
+      // Вставка алергії для кожного продукту
+      const { data, error } = await supabase
+        .from("allergy")
+        .insert([{ user_id: userId, name: product.name }])
+        .select("*") // Явно вказуємо, що потрібно повернути вставлені дані
+        .single();
+
+      if (error) {
+        console.error("Error inserting allergy data:", error);
+      } else {
+        console.log("Allergy data inserted successfully:", data);
+        const allergyId = data.id; // Отримуємо id алергії
+        addId(allergyId);
+        // Вставка підкатегорій для кожної алергії
+        for (let subcategory of selectedSubcategories) {
+          const { data: subcategoryData, error: subcategoryError } =
+            await supabase
+              .from("subcategories")
+              .insert([{ name: subcategory, allergy_id: allergyId }])
+              .select("*") // Явно вказуємо, що потрібно повернути вставлені дані
+              .single();
+
+          if (subcategoryError) {
+            console.error(
+              "Error inserting subcategory data:",
+              subcategoryError
+            );
+          } else {
+            console.log(
+              "Subcategory data inserted successfully:",
+              subcategoryData
+            );
+          }
+        }
+      }
+    }
+  };
 
   const handleSelectCategory = (itemIndex, category) => {
     setSelectedCategories((prevSelectedCategories) => {
@@ -32,7 +117,10 @@ const Categories = ({ products }) => {
   };
 
   return (
-    <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
+    <ScrollView
+      style={styles.scrollView}
+      contentContainerStyle={styles.scrollViewContent}
+    >
       <View style={styles.container}>
         <Text style={styles.t}>Оберіть категорії</Text>
         {products &&
@@ -76,7 +164,9 @@ const Categories = ({ products }) => {
                                 handleRemoveCategory(itemIndex, category)
                               }
                             >
-                              <Text style={styles.removeCategory}>Видалити</Text>
+                              <Text style={styles.removeCategory}>
+                                Видалити
+                              </Text>
                             </TouchableOpacity>
                           )}
                       </View>
@@ -86,9 +176,17 @@ const Categories = ({ products }) => {
               )}
             </View>
           ))}
-
       </View>
-      <Button style={styles.button} labelStyle={styles.buttonLabel} onPress={() => navigation.navigate("AddSymptoms")}>Перейти до симптомів</Button>
+      <Button
+        style={styles.button}
+        labelStyle={styles.buttonLabel}
+        onPress={() => {
+          navigation.navigate("AddSymptoms");
+          saveSelectedProducts(products);
+        }}
+      >
+        Перейти до симптомів
+      </Button>
     </ScrollView>
   );
 };
@@ -118,13 +216,12 @@ const styles = StyleSheet.create({
     fontWeight: "900",
     marginBottom: 5,
   },
-  t:{
+  t: {
     fontSize: 24,
     fontWeight: "800",
     marginBottom: 5,
     color: "white",
-    marginTop: 10
-
+    marginTop: 10,
   },
   product: {
     width: 88,
@@ -182,13 +279,11 @@ const styles = StyleSheet.create({
     marginBottom: 70,
     width: 300,
     alignSelf: "center",
-    marginTop: 20
-
-
+    marginTop: 20,
   },
   buttonLabel: {
     fontSize: 20,
-    color: "black"  // Increase this value to make the text larger
+    color: "black", // Increase this value to make the text larger
   },
 });
 
