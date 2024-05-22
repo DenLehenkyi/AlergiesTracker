@@ -167,8 +167,6 @@ const AddSymptomsScreen = () => {
     allergies.some((allergy) => allergy.name === item.name)
   );
 
-
-
   const saveSymptomsToDB = async () => {
     const symptomsData = [];
   
@@ -207,8 +205,26 @@ const AddSymptomsScreen = () => {
     }
   
     console.log("Inserted data:", insertedData);
-  };
   
+    // Update the dangerous field for selected allergies
+    const dangerousUpdates = allergies
+      .filter((allergy) => dangerousAllergens.includes(allergy.name))
+      .map((allergy) => ({
+        id: allergy.id,
+        dangerous: true,
+      }));
+  
+    const { data: updatedData, error: updateError } = await supabase
+      .from("allergy")
+      .upsert(dangerousUpdates);
+  
+    if (updateError) {
+      console.error("Error updating dangerous field:", updateError);
+      return;
+    }
+  
+    console.log("Dangerous field updated successfully.", updatedData);
+  };
   
 
   return (
@@ -427,6 +443,4 @@ const styles = StyleSheet.create({
   },
 });
 
-
 export default AddSymptomsScreen;
-

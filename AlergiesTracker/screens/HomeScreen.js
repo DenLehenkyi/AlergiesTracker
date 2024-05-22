@@ -18,7 +18,10 @@ export default function HomeScreen() {
 
   useEffect(() => {
     async function fetchSession() {
-      const { data: { session }, error } = await supabase.auth.getSession();
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
       if (error) {
         console.error("Error fetching session:", error);
         return;
@@ -28,9 +31,11 @@ export default function HomeScreen() {
 
     fetchSession();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session);
+      }
+    );
 
     return () => {
       authListener.subscription.unsubscribe();
@@ -65,12 +70,15 @@ export default function HomeScreen() {
         symptomsData[allergy.id] = symptomsRes.map((symptom) => symptom.name);
 
         // Fetch subcategories
-        const { data: subcategoriesRes, error: subcategoriesError } = await supabase
-          .from("subcategories")
-          .select("name")
-          .eq("allergy_id", allergy.id);
+        const { data: subcategoriesRes, error: subcategoriesError } =
+          await supabase
+            .from("subcategories")
+            .select("name")
+            .eq("allergy_id", allergy.id);
         if (subcategoriesError) throw subcategoriesError;
-        subcategoriesData[allergy.id] = subcategoriesRes.map((subcategory) => subcategory.name);
+        subcategoriesData[allergy.id] = subcategoriesRes.map(
+          (subcategory) => subcategory.name
+        );
       }
 
       setSymptoms(symptomsData);
@@ -88,15 +96,23 @@ export default function HomeScreen() {
 
   // Function to handle adding new allergy
   const handleAddAllergy = async (newAllergy) => {
-    // Add new allergy to the database
-    const { data, error } = await supabase.from("allergy").insert([newAllergy]);
-    if (error) {
+    try {
+      // Add new allergy to the database
+      const { data: insertedData, error } = await supabase
+        .from("allergy")
+        .insert([newAllergy]);
+      if (error) {
+        console.error("Error adding allergy:", error);
+        return;
+      }
+  
+      // Fetch updated data for symptoms and subcategories after the new allergy is added
+      await fetchAllData();
+    } catch (error) {
       console.error("Error adding allergy:", error);
-      return;
     }
-    // Fetch updated data
-    fetchAllData();
   };
+  
 
   const renderAllergyItem = ({ item }) => (
     <View style={[styles.allergyItem, item.dangerous && styles.dangerousItem]}>
@@ -130,7 +146,7 @@ export default function HomeScreen() {
   return (
     <>
       <MyDrawer />
-      <View style={[styles.container, { backgroundColor: '#78c599' }]}>
+      <View style={[styles.container, { backgroundColor: "#78c599" }]}>
         <FlatList
           ListHeaderComponent={() => (
             <>
@@ -139,14 +155,6 @@ export default function HomeScreen() {
                   {language === "ua" ? "Ваші алергії" : "Your Allergies"}
                 </Text>
               </View>
-              <TouchableRipple
-                style={[styles.button, { backgroundColor: theme.buttonColor }]}
-                onPress={() => navigation.navigate("AddAllergy", { onAdd: handleAddAllergy })}
-              >
-                <Text style={[styles.buttonText, { color: theme.textColor }]}>
-                  {language === "ua" ? "Додати алергію" : "Add allergy"}
-                </Text>
-              </TouchableRipple>
             </>
           )}
           data={allergies}
@@ -154,6 +162,16 @@ export default function HomeScreen() {
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={styles.listContent}
         />
+        <TouchableRipple
+          style={[styles.button, { backgroundColor: theme.buttonColor }]}
+          onPress={() =>
+            navigation.navigate("AddAllergy", { onAdd: handleAddAllergy })
+          }
+        >
+          <Text style={[styles.buttonText, { color: theme.textColor }]}>
+            {language === "ua" ? "Додати алергію" : "Add allergy"}
+          </Text>
+        </TouchableRipple>
       </View>
     </>
   );
@@ -172,7 +190,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 15,
     marginTop: 20,
-    alignSelf: "center"
+    alignSelf: "center",
   },
   buttonText: {
     fontSize: 16,
@@ -184,7 +202,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 22,
     fontWeight: "bold",
     marginBottom: 10,
     textAlign: "center",

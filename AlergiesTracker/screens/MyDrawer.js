@@ -12,7 +12,7 @@ import LanguageContext from "../Context/LanguageContext";
 
 const MyDrawer = ({ loadTheme, saveTheme }) => {
   const { theme, toggleTheme } = useContext(ThemeContext);
-  const {language, toggleLanguage} = useContext(LanguageContext);
+  const { language, toggleLanguage } = useContext(LanguageContext);
 
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const navigation = useNavigation();
@@ -22,17 +22,31 @@ const MyDrawer = ({ loadTheme, saveTheme }) => {
   };
 
   return (
-    <>
-      <Appbar.Header style={[styles.header, {backgroundColor: theme.backgroundColor}]} elevation={0}>
-        <Appbar.Action icon="menu" onPress={toggleDrawer} color={theme.textColor} />
-        <Appbar.Content title="Alergies Tracker" color={theme.textColor}/>
+    <View style={{ marginTop: -48 }}>
+      <Appbar.Header
+        style={[styles.header, { backgroundColor: theme.backgroundColor }]}
+        elevation={0}
+      >
+        <Appbar.Action
+          icon="menu"
+          onPress={toggleDrawer}
+          color={theme.textColor}
+        />
+        <Appbar.Content title="Alergies Tracker" color={theme.textColor} />
       </Appbar.Header>
       {drawerOpen && (
-        <View style={[styles.drawerSection, {backgroundColor: theme.backgroundColor}]}>
+        <View
+          style={[
+            styles.drawerSection,
+            { backgroundColor: theme.backgroundColor },
+          ]}
+        >
           <Drawer.Item
             label={language === "ua" ? "Головна" : "Home"}
-           
-            onPress={() => navigation.navigate("Home")}
+            onPress={() => {
+              setDrawerOpen(false);
+              navigation.navigate("Home");
+            }}
             style={styles.drawerItem}
             labelStyle={{ color: theme.textColor }}
             icon={() => (
@@ -60,7 +74,7 @@ const MyDrawer = ({ loadTheme, saveTheme }) => {
           />
 
           <Drawer.Item
-           label={language === "ua" ? "Налаштування" : "Settings"}
+            label={language === "ua" ? "Налаштування" : "Settings"}
             onPress={() => navigation.navigate("Settings")}
             style={styles.drawerItem}
             icon={() => (
@@ -74,7 +88,7 @@ const MyDrawer = ({ loadTheme, saveTheme }) => {
           />
         </View>
       )}
-    </>
+    </View>
   );
 };
 
