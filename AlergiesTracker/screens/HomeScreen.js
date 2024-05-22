@@ -1,30 +1,27 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { Button, TouchableRipple } from "react-native-paper";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { MaterialIcons } from "@expo/vector-icons"; // Потрібно встановити expo/vector-icons
-import MyDrawer from "./MyDrawer";
+import React, { useState, useEffect, useContext } from "react";
+import { View, Text, StyleSheet, FlatList, ScrollView } from "react-native";
+import { TouchableRipple } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
-import AddAllergyScreen from "./AddAllergyScreen";
-import { useContext } from "react";
-import lightTheme from "../themes/lightTheme";
-import darkTheme from "../themes/darkTheme";
-import ThemeContext from "../Context/ThemeContext";
-import { Session } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
+import MyDrawer from "./MyDrawer";
+import ThemeContext from "../Context/ThemeContext";
 import LanguageContext from "../Context/LanguageContext";
 
 export default function HomeScreen() {
-  const { theme, toggleTheme } = useContext(ThemeContext);
-  const {language, toggleLanguage} = useContext(LanguageContext);
-  const [userData, setUserData] = useState(null);
-  const navigation = useNavigation();
+  const { theme } = useContext(ThemeContext);
+  const { language } = useContext(LanguageContext);
   const [allergies, setAllergies] = useState([]);
-  const [session, setSession] = useState(Session);
+  const [symptoms, setSymptoms] = useState({});
+  const [subcategories, setSubcategories] = useState({});
+  const [session, setSession] = useState(null);
+  const navigation = useNavigation();
 
   useEffect(() => {
     async function fetchSession() {
-      const { data: { session }, error } = await supabase.auth.getSession();
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
       if (error) {
         console.error("Error fetching session:", error);
         return;
@@ -34,26 +31,24 @@ export default function HomeScreen() {
 
     fetchSession();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session);
+      }
+    );
 
     return () => {
       authListener.subscription.unsubscribe();
     };
   }, []);
 
-  console.log(session)
-  
   const userId = session ? session.user.id : null;
 
   useEffect(() => {
     async function fetchAllergies() {
+      if (!userId) return;
+
       try {
-        if (!userId) {
-          return; // Нічого не робимо, якщо user_id недоступний
-        }
-  
         const { data, error } = await supabase
           .from("allergy")
           .select("*")
@@ -66,35 +61,124 @@ export default function HomeScreen() {
         console.error("Error fetching allergies:", error);
       }
     }
-  
+
     fetchAllergies();
   }, [userId]);
 
+  useEffect(() => {
+    async function fetchSymptoms() {
+      if (!allergies.length) return;
+
+      const symptomsData = {};
+
+      for (const allergy of allergies) {
+        try {
+          const { data, error } = await supabase
+            .from("symptom")
+            .select("name")
+            .eq("allergy_id", allergy.id);
+          if (error) {
+            throw error;
+          }
+          symptomsData[allergy.id] = data.map((symptom) => symptom.name);
+        } catch (error) {
+          console.error("Error fetching symptoms:", error);
+          symptomsData[allergy.id] = [];
+        }
+      }
+
+      setSymptoms(symptomsData);
+    }
+
+    fetchSymptoms();
+  }, [allergies]);
+
+  useEffect(() => {
+    async function fetchSubcategories() {
+      if (!allergies.length) return;
+
+      const subcategoriesData = {};
+
+      for (const allergy of allergies) {
+        try {
+          const { data, error } = await supabase
+            .from("subcategories")
+            .select("name")
+            .eq("allergy_id", allergy.id);
+          if (error) {
+            throw error;
+          }
+          subcategoriesData[allergy.id] = data.map(
+            (subcategory) => subcategory.name
+          );
+        } catch (error) {
+          console.error("Error fetching subcategories:", error);
+          subcategoriesData[allergy.id] = [];
+        }
+      }
+
+      setSubcategories(subcategoriesData);
+    }
+
+    fetchSubcategories();
+  }, [allergies]);
+
+  const renderAllergyItem = ({ item }) => (
+    <View style={styles.allergyItem}>
+      <Text style={[styles.allergyName, { color: theme.textColor }]}>
+        {language === "ua" ? "Алергія:" : "Allergy:"} {item.name}
+      </Text>
+      <Text style={[styles.subcategories, { color: theme.textColor }]}>
+        {language === "ua" ? "Підкатегорії:" : "Subcategories:"}{" "}
+        {subcategories[item.id] && subcategories[item.id].length > 0
+          ? subcategories[item.id].join(", ")
+          : language === "ua"
+          ? "Немає підкатегорій"
+          : "No subcategories"}
+      </Text>
+      <Text style={[styles.subcategories, { color: theme.textColor }]}>
+        {language === "ua" ? "Симптоми:" : "Symptoms:"}{" "}
+        {symptoms[item.id] && symptoms[item.id].length > 0
+          ? symptoms[item.id].join(", ")
+          : language === "ua"
+          ? "Немає симптомів"
+          : "No symptoms"}
+      </Text>
+    </View>
+  );
 
   return (
     <>
       <MyDrawer />
-      <View style={[styles.container, {backgroundColor:theme.backgroundColor}, {fontFamily:theme.font}]}>
-      <View style={styles.allergiesContainer}>
-        <Text style={styles.sectionTitle}>Ваші алергії</Text>
-        {allergies.map((userAllergy, index) => (
-          <View key={index} style={styles.allergy}>
-            <Text style={styles.allergyName}>Алергія: {userAllergy.name}</Text>
-            {/* <Text style={styles.subcategories}>Підвиди: {userAllergy.subcategories.join(', ')}</Text>
-            <Text style={styles.symptoms}>Симптоми: {userAllergy.symptoms.join(', ')}</Text> */}
-          </View>
-        ))}
-      </View>
-
-
-        <TouchableRipple
-          style={[styles.button, {backgroundColor:theme.buttonColor }]}
-          onPress={() => navigation.navigate('AddAllergy')}
+      <ScrollView>
+        <View
+          style={[
+            styles.container,
+            { backgroundColor: theme.backgroundColor },
+            { fontFamily: theme.font },
+          ]}
         >
-          <Text style={[styles.buttonText, {color: theme.textColor}]}>{language === "ua" ? "Додати алергію" : "Add allergy"}</Text>
-        </TouchableRipple>
-  
-      </View>
+          <View style={styles.allergiesContainer}>
+            <Text style={[styles.sectionTitle, { color: theme.textColor }]}>
+              {language === "ua" ? "Ваші алергії" : "Your Allergies"}
+            </Text>
+            <FlatList
+              data={allergies}
+              renderItem={renderAllergyItem}
+              keyExtractor={(item) => item.id.toString()}
+            />
+          </View>
+
+          <TouchableRipple
+            style={[styles.button, { backgroundColor: theme.buttonColor }]}
+            onPress={() => navigation.navigate("AddAllergy")}
+          >
+            <Text style={[styles.buttonText, { color: theme.textColor }]}>
+              {language === "ua" ? "Додати алергію" : "Add allergy"}
+            </Text>
+          </TouchableRipple>
+        </View>
+      </ScrollView>
     </>
   );
 }
@@ -104,6 +188,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    padding: 16,
   },
   button: {
     backgroundColor: "#8BDBAD",
@@ -115,20 +200,25 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   buttonText: {
-    color: "black",
     fontSize: 16,
     fontWeight: "bold",
   },
   allergiesContainer: {
     marginTop: 20,
+    width: "100%",
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: "bold",
     marginBottom: 10,
+    textAlign: "center",
   },
-  allergy: {
-    marginBottom: 10,
+  allergyItem: {
+    backgroundColor: "#E2FFE6",
+    padding: 15,
+    marginVertical: 8,
+    borderRadius: 10,
+    elevation: 2,
   },
   allergyName: {
     fontWeight: "bold",
