@@ -63,7 +63,7 @@ const SettingsScreen = () => {
               />
             )}
           />
-          <List.Item
+          {/* <List.Item
             title={language === "ua" ? "Вимкнути звук" : "Mute"}
             titleStyle={[styles.title, { color: theme.textColor }]}
             right={() => (
@@ -74,7 +74,7 @@ const SettingsScreen = () => {
                 onValueChange={toggleMute}
               />
             )}
-          />
+          /> */}
           <List.Item
             title={language === "ua" ? "Вийти" : "Logout"}
             titleStyle={[styles.title, { color: theme.textColor }]}

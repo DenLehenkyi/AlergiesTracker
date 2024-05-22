@@ -42,7 +42,7 @@ export default function ProfileScreen() {
           .eq("id", session.user.id)
           .single();
         if (data) {
-          setUserData(data);
+          setUserData({ ...data, email: session.user.email });
         } else if (error) {
           console.error("Error fetching user data:", error);
         }
@@ -71,7 +71,7 @@ export default function ProfileScreen() {
             <MaterialIcons name="person" size={50} color={theme.textColor} style={styles.icon} />
             <View style={styles.userInfoField}>
               <Text style={[styles.fieldLabel, { color: theme.buttonColor }]}>{language === "ua" ? "Пошта:" : "Email"}</Text>
-              <Text style={[styles.fieldValue, { color: theme.textColor }]}>{userData.username}</Text>
+              <Text style={[styles.fieldValue, { color: theme.textColor }]}>{userData.email}</Text>
             </View>
             <View style={styles.userInfoField}>
               <Text style={[styles.fieldLabel, { color: theme.buttonColor }]}>{language === "ua" ? "Ім'я:" : "Name"}</Text>
