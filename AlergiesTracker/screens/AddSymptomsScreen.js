@@ -153,12 +153,12 @@ const AddSymptomsScreen = () => {
     });
   };
 
-  const markAsDangerous = () => {
+  const markAsDangerous = (allergyName) => {
     setDangerousAllergens((prevState) => {
-      if (prevState.includes(currentAllergy)) {
-        return prevState.filter((allergy) => allergy !== currentAllergy);
+      if (prevState.includes(allergyName)) {
+        return prevState.filter((allergy) => allergy !== allergyName);
       } else {
-        return [...prevState, currentAllergy];
+        return [...prevState, allergyName];
       }
     });
   };
@@ -263,13 +263,10 @@ const AddSymptomsScreen = () => {
               </View>
               <Button
                 title="Позначити як особливо небезпечний алерген"
-                onPress={() => {
-                  setCurrentAllergy(allergy.name);
-                  markAsDangerous();
-                }}
+                onPress={() => markAsDangerous(allergy.name)}
               />
             </View>
-
+  
             <Modal
               animationType="slide"
               transparent={true}
@@ -308,14 +305,18 @@ const AddSymptomsScreen = () => {
           </View>
         );
       })}
-
-      <Button onPress={()=> {
-        saveSymptomsToDB()
-        navigation.navigate("Home")
-      }} title="Завершити"></Button>
+  
+      <Button
+        onPress={() => {
+          saveSymptomsToDB();
+          navigation.navigate("Home");
+        }}
+        title="Завершити"
+      ></Button>
     </ScrollView>
   );
-};
+
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -426,4 +427,6 @@ const styles = StyleSheet.create({
   },
 });
 
+
 export default AddSymptomsScreen;
+

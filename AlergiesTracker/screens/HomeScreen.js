@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useContext } from "react";
-import { View, Text, StyleSheet, FlatList, ScrollView } from "react-native";
+import React, { useState, useEffect, useContext, useCallback } from "react";
+import { View, Text, StyleSheet, FlatList } from "react-native";
 import { TouchableRipple } from "react-native-paper";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { supabase } from "../lib/supabase";
 import MyDrawer from "./MyDrawer";
 import ThemeContext from "../Context/ThemeContext";
@@ -18,10 +18,7 @@ export default function HomeScreen() {
 
   useEffect(() => {
     async function fetchSession() {
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.getSession();
+      const { data: { session }, error } = await supabase.auth.getSession();
       if (error) {
         console.error("Error fetching session:", error);
         return;
@@ -31,11 +28,9 @@ export default function HomeScreen() {
 
     fetchSession();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session);
-      }
-    );
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
 
     return () => {
       authListener.subscription.unsubscribe();
@@ -44,90 +39,75 @@ export default function HomeScreen() {
 
   const userId = session ? session.user.id : null;
 
-  useEffect(() => {
-    async function fetchAllergies() {
-      if (!userId) return;
+  const fetchAllData = useCallback(async () => {
+    if (!userId) return;
 
-      try {
-        const { data, error } = await supabase
-          .from("allergy")
-          .select("*")
-          .eq("user_id", userId);
-        if (error) {
-          throw error;
-        }
-        setAllergies(data);
-      } catch (error) {
-        console.error("Error fetching allergies:", error);
-      }
-    }
+    try {
+      // Fetch allergies
+      const { data: allergiesData, error: allergiesError } = await supabase
+        .from("allergy")
+        .select("*")
+        .eq("user_id", userId);
+      if (allergiesError) throw allergiesError;
 
-    fetchAllergies();
-  }, [userId]);
-
-  useEffect(() => {
-    async function fetchSymptoms() {
-      if (!allergies.length) return;
+      setAllergies(allergiesData);
 
       const symptomsData = {};
+      const subcategoriesData = {};
 
-      for (const allergy of allergies) {
-        try {
-          const { data, error } = await supabase
-            .from("symptom")
-            .select("name")
-            .eq("allergy_id", allergy.id);
-          if (error) {
-            throw error;
-          }
-          symptomsData[allergy.id] = data.map((symptom) => symptom.name);
-        } catch (error) {
-          console.error("Error fetching symptoms:", error);
-          symptomsData[allergy.id] = [];
-        }
+      for (const allergy of allergiesData) {
+        // Fetch symptoms
+        const { data: symptomsRes, error: symptomsError } = await supabase
+          .from("symptom")
+          .select("name")
+          .eq("allergy_id", allergy.id);
+        if (symptomsError) throw symptomsError;
+        symptomsData[allergy.id] = symptomsRes.map((symptom) => symptom.name);
+
+        // Fetch subcategories
+        const { data: subcategoriesRes, error: subcategoriesError } = await supabase
+          .from("subcategories")
+          .select("name")
+          .eq("allergy_id", allergy.id);
+        if (subcategoriesError) throw subcategoriesError;
+        subcategoriesData[allergy.id] = subcategoriesRes.map((subcategory) => subcategory.name);
       }
 
       setSymptoms(symptomsData);
-    }
-
-    fetchSymptoms();
-  }, [allergies]);
-
-  useEffect(() => {
-    async function fetchSubcategories() {
-      if (!allergies.length) return;
-
-      const subcategoriesData = {};
-
-      for (const allergy of allergies) {
-        try {
-          const { data, error } = await supabase
-            .from("subcategories")
-            .select("name")
-            .eq("allergy_id", allergy.id);
-          if (error) {
-            throw error;
-          }
-          subcategoriesData[allergy.id] = data.map(
-            (subcategory) => subcategory.name
-          );
-        } catch (error) {
-          console.error("Error fetching subcategories:", error);
-          subcategoriesData[allergy.id] = [];
-        }
-      }
-
       setSubcategories(subcategoriesData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
     }
+  }, [userId]);
 
-    fetchSubcategories();
-  }, [allergies]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchAllData();
+    }, [fetchAllData])
+  );
+
+  // Function to handle adding new allergy
+  const handleAddAllergy = async (newAllergy) => {
+    // Add new allergy to the database
+    const { data, error } = await supabase.from("allergy").insert([newAllergy]);
+    if (error) {
+      console.error("Error adding allergy:", error);
+      return;
+    }
+    // Fetch updated data
+    fetchAllData();
+  };
 
   const renderAllergyItem = ({ item }) => (
-    <View style={styles.allergyItem}>
+    <View style={[styles.allergyItem, item.dangerous && styles.dangerousItem]}>
       <Text style={[styles.allergyName, { color: theme.textColor }]}>
         {language === "ua" ? "Алергія:" : "Allergy:"} {item.name}
       </Text>
+      {item.dangerous && (
+        <Text style={[styles.dangerousText, { color: "red" }]}>
+          {language === "ua" ? "Небезпечно!" : "Dangerous!"}
+        </Text>
+      )}
       <Text style={[styles.subcategories, { color: theme.textColor }]}>
         {language === "ua" ? "Підкатегорії:" : "Subcategories:"}{" "}
         {subcategories[item.id] && subcategories[item.id].length > 0
@@ -150,35 +130,31 @@ export default function HomeScreen() {
   return (
     <>
       <MyDrawer />
-      <ScrollView>
-        <View
-          style={[
-            styles.container,
-            { backgroundColor: theme.backgroundColor },
-            { fontFamily: theme.font },
-          ]}
-        >
-          <View style={styles.allergiesContainer}>
-            <Text style={[styles.sectionTitle, { color: theme.textColor }]}>
-              {language === "ua" ? "Ваші алергії" : "Your Allergies"}
-            </Text>
-            <FlatList
-              data={allergies}
-              renderItem={renderAllergyItem}
-              keyExtractor={(item) => item.id.toString()}
-            />
-          </View>
-
-          <TouchableRipple
-            style={[styles.button, { backgroundColor: theme.buttonColor }]}
-            onPress={() => navigation.navigate("AddAllergy")}
-          >
-            <Text style={[styles.buttonText, { color: theme.textColor }]}>
-              {language === "ua" ? "Додати алергію" : "Add allergy"}
-            </Text>
-          </TouchableRipple>
-        </View>
-      </ScrollView>
+      <View style={[styles.container, { backgroundColor: '#78c599' }]}>
+        <FlatList
+          ListHeaderComponent={() => (
+            <>
+              <View style={styles.allergiesContainer}>
+                <Text style={[styles.sectionTitle, { color: theme.textColor }]}>
+                  {language === "ua" ? "Ваші алергії" : "Your Allergies"}
+                </Text>
+              </View>
+              <TouchableRipple
+                style={[styles.button, { backgroundColor: theme.buttonColor }]}
+                onPress={() => navigation.navigate("AddAllergy", { onAdd: handleAddAllergy })}
+              >
+                <Text style={[styles.buttonText, { color: theme.textColor }]}>
+                  {language === "ua" ? "Додати алергію" : "Add allergy"}
+                </Text>
+              </TouchableRipple>
+            </>
+          )}
+          data={allergies}
+          renderItem={renderAllergyItem}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={styles.listContent}
+        />
+      </View>
     </>
   );
 }
@@ -186,8 +162,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
     padding: 16,
   },
   button: {
@@ -198,6 +172,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 15,
     marginTop: 20,
+    alignSelf: "center"
   },
   buttonText: {
     fontSize: 16,
@@ -206,12 +181,16 @@ const styles = StyleSheet.create({
   allergiesContainer: {
     marginTop: 20,
     width: "100%",
+    alignItems: "center",
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 10,
     textAlign: "center",
+  },
+  listContent: {
+    paddingBottom: 20,
   },
   allergyItem: {
     backgroundColor: "#E2FFE6",
@@ -230,5 +209,14 @@ const styles = StyleSheet.create({
   },
   symptoms: {
     fontSize: 16,
+  },
+  dangerousItem: {
+    borderColor: "red",
+    borderWidth: 2,
+  },
+  dangerousText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "red",
   },
 });
