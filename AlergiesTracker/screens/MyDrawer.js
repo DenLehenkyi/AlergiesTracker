@@ -8,9 +8,12 @@ import { useContext } from "react";
 import lightTheme from "../themes/lightTheme";
 import darkTheme from "../themes/darkTheme";
 import ThemeContext from "../Context/ThemeContext";
+import LanguageContext from "../Context/LanguageContext";
 
 const MyDrawer = ({ loadTheme, saveTheme }) => {
   const { theme, toggleTheme } = useContext(ThemeContext);
+  const {language, toggleLanguage} = useContext(LanguageContext);
+
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const navigation = useNavigation();
 
@@ -27,7 +30,7 @@ const MyDrawer = ({ loadTheme, saveTheme }) => {
       {drawerOpen && (
         <View style={[styles.drawerSection, {backgroundColor: theme.backgroundColor}]}>
           <Drawer.Item
-            label="Головна"
+            label={language === "ua" ? "Головна" : "Home"}
            
             onPress={() => navigation.navigate("Home")}
             style={styles.drawerItem}
@@ -43,7 +46,7 @@ const MyDrawer = ({ loadTheme, saveTheme }) => {
           />
 
           <Drawer.Item
-            label="Обліковий запис"
+            label={language === "ua" ? "Обліковий запис" : "Account"}
             onPress={() => navigation.navigate("Profile")}
             style={styles.drawerItem}
             icon={() => (
@@ -57,7 +60,7 @@ const MyDrawer = ({ loadTheme, saveTheme }) => {
           />
 
           <Drawer.Item
-            label="Налаштування"
+           label={language === "ua" ? "Налаштування" : "Settings"}
             onPress={() => navigation.navigate("Settings")}
             style={styles.drawerItem}
             icon={() => (

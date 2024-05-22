@@ -6,16 +6,17 @@ import { useNavigation } from "@react-navigation/native";
 import lightTheme from "../themes/lightTheme";
 import darkTheme from "../themes/darkTheme";
 import ThemeContext from "../Context/ThemeContext";
-import { Session } from '@supabase/supabase-js';
+import { Session } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
+import LanguageContext from "../Context/LanguageContext";
 
 const SettingsScreen = () => {
   const [session, setSession] = useState(Session);
   const { theme, toggleTheme } = useContext(ThemeContext);
- 
+  const { language, toggleLanguage } = useContext(LanguageContext);
   const [isDarkTheme, setIsDarkTheme] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const [language, setLanguage] = useState("ua"); 
+
   const navigation = useNavigation();
 
   //const toggleTheme = () => setIsDarkTheme(!isDarkTheme);
@@ -27,19 +28,15 @@ const SettingsScreen = () => {
     navigation.navigate("Login");
   };
 
-  const toggleLanguage = () => {
-    setLanguage((prevLanguage) => (prevLanguage === "ua" ? "en" : "ua"));
-  };
-
   return (
     <View
       style={[styles.mainContainer, { backgroundColor: theme.backgroundColor }]}
     >
       <View style={[styles.container, { backgroundColor: theme.lightGreen }]}>
         <List.Section>
-          <List.Subheader style={{ color: theme.textColor }}>
+          {/* <List.Subheader style={{ color: theme.textColor }}>
             {language === "ua" ? "Налаштування" : "Settings"}
-          </List.Subheader>
+          </List.Subheader> */}
           <List.Item
             title={language === "ua" ? "Змінити мову" : "Change Language"}
             titleStyle={[styles.title, { color: theme.textColor }]}

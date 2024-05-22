@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { supabase } from "../lib/supabase";
 import { Session } from "@supabase/supabase-js";
@@ -17,7 +17,7 @@ import PlisniavaSvg from "../assets/svgs/plisniava";
 import InsectsSvg from "../assets/svgs/insects";
 import DrugsSvgs from "../assets/svgs/drugs";
 import { useState, useEffect } from "react";
-
+import LanguageContext from "../Context/LanguageContext";
 const ProductsArray = [
   { name: "Яйця", svg: EggSvg, subcategories: ["Білок", "Жовток"] },
   {
