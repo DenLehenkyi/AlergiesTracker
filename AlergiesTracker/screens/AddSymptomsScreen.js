@@ -163,12 +163,12 @@ const AddSymptomsScreen = () => {
     });
   };
 
-  const markAsDangerous = () => {
+  const markAsDangerous = (allergyName) => {
     setDangerousAllergens((prevState) => {
-      if (prevState.includes(currentAllergy)) {
-        return prevState.filter((allergy) => allergy !== currentAllergy);
+      if (prevState.includes(allergyName)) {
+        return prevState.filter((allergy) => allergy !== allergyName);
       } else {
-        return [...prevState, currentAllergy];
+        return [...prevState, allergyName];
       }
     });
   };
@@ -216,7 +216,27 @@ const AddSymptomsScreen = () => {
     }
 
     console.log("Inserted data:", insertedData);
+  
+    // Update the dangerous field for selected allergies
+    const dangerousUpdates = allergies
+      .filter((allergy) => dangerousAllergens.includes(allergy.name))
+      .map((allergy) => ({
+        id: allergy.id,
+        dangerous: true,
+      }));
+  
+    const { data: updatedData, error: updateError } = await supabase
+      .from("allergy")
+      .upsert(dangerousUpdates);
+  
+    if (updateError) {
+      console.error("Error updating dangerous field:", updateError);
+      return;
+    }
+  
+    console.log("Dangerous field updated successfully.", updatedData);
   };
+  
 
   return (
     <ScrollView style={{ backgroundColor: theme.backgroundColor }}>
@@ -304,7 +324,7 @@ const AddSymptomsScreen = () => {
                 }}
               />
             </View>
-
+  
             <Modal
               animationType="slide"
               transparent={true}
@@ -369,7 +389,8 @@ const AddSymptomsScreen = () => {
       />
     </ScrollView>
   );
-};
+
+}
 
 const styles = StyleSheet.create({
   container: {

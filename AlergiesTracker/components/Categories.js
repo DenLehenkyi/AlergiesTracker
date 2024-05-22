@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   View,
   Text,
@@ -9,9 +9,6 @@ import {
 import { Button } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import { supabase } from "../lib/supabase";
-import { Session } from "@supabase/supabase-js";
-import { useContext } from "react";
-import AllergyProvider from "../Context/AllergyContext";
 import { AllergyContext } from "../Context/AllergyContext";
 import { Language } from "@mui/icons-material";
 import LanguageContext from "../Context/LanguageContext";
@@ -23,9 +20,11 @@ const Categories = ({ products }) => {
   const navigation = useNavigation();
   const [selectedCategories, setSelectedCategories] = useState({});
   const [session, setSession] = useState(null);
-  const { addId } = useContext(AllergyContext);
+  const { addId, resetIds } = useContext(AllergyContext);
 
   useEffect(() => {
+    resetIds();
+
     async function fetchSession() {
       const {
         data: { session },
@@ -62,7 +61,7 @@ const Categories = ({ products }) => {
       // Вставка алергії для кожного продукту
       const { data, error } = await supabase
         .from("allergy")
-        .insert([{ user_id: userId, name: product.name }])
+        .insert([{ user_id: userId, name: product.name, dangerous: false }])
         .select("*") // Явно вказуємо, що потрібно повернути вставлені дані
         .single();
 
