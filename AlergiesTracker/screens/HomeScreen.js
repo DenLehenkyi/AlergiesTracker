@@ -116,7 +116,7 @@ export default function HomeScreen() {
 
   const renderAllergyItem = ({ item }) => (
     <View style={[styles.allergyItem, item.dangerous && styles.dangerousItem]}>
-      <Text style={[styles.allergyName, { color: theme.textColor }]}>
+      <Text style={[styles.allergyName, { color: theme.blackColor }]}>
         {language === "ua" ? "Алергія:" : "Allergy:"} {item.name}
       </Text>
       {item.dangerous && (
@@ -124,7 +124,7 @@ export default function HomeScreen() {
           {language === "ua" ? "Небезпечно!" : "Dangerous!"}
         </Text>
       )}
-      <Text style={[styles.subcategories, { color: theme.textColor }]}>
+      <Text style={[styles.subcategories, { color: theme.blackColor }]}>
         {language === "ua" ? "Підкатегорії:" : "Subcategories:"}{" "}
         {subcategories[item.id] && subcategories[item.id].length > 0
           ? subcategories[item.id]
@@ -144,6 +144,7 @@ export default function HomeScreen() {
   return (
     <>
       <MyDrawer />
+   
       <View
         style={[
           styles.container,
@@ -151,30 +152,33 @@ export default function HomeScreen() {
           { fontFamily: theme.font },
         ]}
       >
+        
+        <TouchableRipple
+          style={[styles.button, { backgroundColor: theme.buttonColor }]}
+          onPress={() => navigation.navigate("AddAllergy")}
+        >
+          <Text style={[styles.buttonText, { color: theme.textColor }]}>
+          {language === 'en' ? 'Add alergy' : "Додати алергію"}
+          </Text>
+        </TouchableRipple>
         <View
           style={[
             styles.allergiesContainer,
             { backgroundColor: theme.backgroundColor },
           ]}
         >
+             
           <Text style={[styles.sectionTitle, { color: theme.textColor }]}>
-            {translate("MyAllergies")}
+          {language === 'en' ? 'My allergies' : "Мої алергії"}
           </Text>
           <FlatList
             data={allergies}
             renderItem={renderAllergyItem}
             keyExtractor={(item) => item.id.toString()}
           />
+       
         </View>
 
-        <TouchableRipple
-          style={[styles.button, { backgroundColor: theme.buttonColor }]}
-          onPress={() => navigation.navigate("AddAllergy")}
-        >
-          <Text style={[styles.buttonText, { color: theme.textColor }]}>
-            {translate("addAllergy")}
-          </Text>
-        </TouchableRipple>
       </View>
     </>
   );

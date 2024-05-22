@@ -93,11 +93,11 @@ const symptomsArray = [
 ];
 
 const AddSymptomsScreen = () => {
-  const { theme } = useContext(ThemeContext);
-  const { language, translate } = useContext(LanguageContext);
   const [modalVisible, setModalVisible] = useState(false);
   const [session, setSession] = useState(null);
   const { selectedIds } = useContext(AllergyContext);
+  const { theme } = useContext(ThemeContext);
+  const { language, translate } = useContext(LanguageContext);
   const [allergies, setAllergies] = useState([]);
   const [selectedSymptoms, setSelectedSymptoms] = useState({});
   const [currentAllergy, setCurrentAllergy] = useState(null);
@@ -216,7 +216,7 @@ const AddSymptomsScreen = () => {
     }
 
     console.log("Inserted data:", insertedData);
-  
+
     // Update the dangerous field for selected allergies
     const dangerousUpdates = allergies
       .filter((allergy) => dangerousAllergens.includes(allergy.name))
@@ -224,24 +224,25 @@ const AddSymptomsScreen = () => {
         id: allergy.id,
         dangerous: true,
       }));
-  
+
     const { data: updatedData, error: updateError } = await supabase
       .from("allergy")
       .upsert(dangerousUpdates);
-  
+
     if (updateError) {
       console.error("Error updating dangerous field:", updateError);
       return;
     }
-  
+
     console.log("Dangerous field updated successfully.", updatedData);
   };
-  
 
   return (
-    <ScrollView style={{ backgroundColor: theme.backgroundColor }}>
+    <ScrollView
+      style={[styles.scrollView, { backgroundColor: theme.backgroundColor }]}
+    >
       <Text style={[styles.title, { color: theme.textColor }]}>
-        {translate("Оберіть симптоми")}
+        {language === "en" ? "Select symptoms" : "Оберіть симптоми"}
       </Text>
       {selectedAllergies.map((allergy, index) => {
         const isDangerous = dangerousAllergens.includes(allergy.name);
@@ -250,20 +251,12 @@ const AddSymptomsScreen = () => {
             style={[
               styles.container,
               isDangerous && styles.dangerousContainer,
-
               { backgroundColor: theme.backgroundColor },
             ]}
             key={index}
           >
-            <View
-              style={[styles.wrap, { backgroundColor: theme.backgroundColor }]}
-            >
-              <View
-                style={[
-                  styles.flex,
-                  { backgroundColor: theme.backgroundColor },
-                ]}
-              >
+            <View style={styles.wrap}>
+              <View style={styles.flex}>
                 <View
                   style={[
                     styles.product,
@@ -318,13 +311,10 @@ const AddSymptomsScreen = () => {
                     ? "Mark as a particularly dangerous allergen"
                     : "Позначити як особливо небезпечний алерген"
                 }
-                onPress={() => {
-                  setCurrentAllergy(allergy.name);
-                  markAsDangerous();
-                }}
+                onPress={() => markAsDangerous(allergy.name)}
               />
             </View>
-  
+
             <Modal
               animationType="slide"
               transparent={true}
@@ -379,18 +369,17 @@ const AddSymptomsScreen = () => {
           </View>
         );
       })}
+
       <Button
         onPress={() => {
           saveSymptomsToDB();
           navigation.navigate("Home");
         }}
         title={language === "en" ? "End" : "Завершити"}
-        
       />
     </ScrollView>
   );
-
-}
+};
 
 const styles = StyleSheet.create({
   container: {

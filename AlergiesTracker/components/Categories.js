@@ -169,7 +169,7 @@ const Categories = ({ products }) => {
                           >
                             {language === "en"
                               ? translate(category)
-                              : item.name}
+                              : category}
                           </Text>
                         </TouchableOpacity>
                         {selectedCategories[itemIndex] &&
